@@ -1,0 +1,137 @@
+!! options
+version=2
+!! end
+
+# Force test runner to ensure Scribunto extension is loaded
+!! functionhooks
+invoke
+!! endfunctionhooks
+
+!! article
+Mustache:LuaSimpleTest
+!! text
+<h1>{{title}}</h1>
+<p>Count: {{count}}</p>
+<div>
+Test
+</div>
+<script>console.log("Test")</script>
+!! endarticle
+
+!! article
+Module:LuaSimpleTest
+!! text
+local p = {}
+
+function p.render(frame)
+	local data = {
+		title = frame.args[1],
+		count = tonumber(frame.args[2])
+	}
+	return mw.ext.mustache.render("LuaSimpleTest", data)
+end
+
+return p
+!! endarticle
+
+!! test
+Mustache Lua: Simple variable substitution
+!! wikitext
+{{#invoke:LuaSimpleTest|render|Hello World|42}}
+!! html
+<h1>Hello World</h1>
+<p>Count: 42</p>
+<div>
+Test
+</div>
+<script>console.log("Test")</script>
+!! end
+
+!! article
+Mustache:LuaArrayTest
+!! text
+<ul>{{#items}}<li>{{.}}</li>{{/items}}</ul>
+!! endarticle
+
+!! article
+Module:LuaArrayTest
+!! text
+local p = {}
+
+function p.render(frame)
+	local items = {}
+	for key, value in pairs(frame.args) do
+		if string.sub(key, 1, 4) == "item" then
+			table.insert(items, value)
+		end
+	end
+	table.sort(items)
+	local data = {
+		items = items
+	}
+	return mw.ext.mustache.render("LuaArrayTest", data)
+end
+
+return p
+!! endarticle
+
+!! test
+Mustache Lua: Array iteration from frame.args
+!! wikitext
+{{#invoke:LuaArrayTest|render|item1=Apple|item2=Banana|item3=Cherry}}
+!! html
+<ul><li>Apple</li><li>Banana</li><li>Cherry</li></ul>
+!! end
+
+!! article
+Mustache:LuaComplexTest
+!! text
+<div>
+{{#categories}}
+<h3>{{name}}</h3>
+<ul>{{#items}}<li>{{name}} - ${{price}} ({{#inStock}}In stock{{/inStock}}{{^inStock}}Out of stock{{/inStock}})</li>{{/items}}</ul>
+{{/categories}}
+</div>
+!! endarticle
+
+!! article
+Module:LuaComplexTest
+!! text
+local p = {}
+
+function p.render(frame)
+	local data = {
+		categories = {
+			{
+				name = "Electronics",
+				items = {
+					{name = "Laptop", price = 999, inStock = true},
+					{name = "Phone", price = 599, inStock = false}
+				}
+			},
+			{
+				name = "Books",
+				items = {
+					{name = "Novel", price = 19, inStock = true}
+				}
+			}
+		}
+	}
+	return mw.ext.mustache.render("LuaComplexTest", data)
+end
+
+return p
+!! endarticle
+
+!! test
+Mustache Lua: Nested tables with conditionals
+!! wikitext
+{{#invoke:LuaComplexTest|render}}
+!! html
+<div>
+<h3>Electronics</h3>
+<ul><li>Laptop - $999 (In stock)</li><li>Phone - $599 (Out of stock)</li></ul>
+<h3>Books</h3>
+<ul><li>Novel - $19 (In stock)</li></ul>
+</div>
+!! end

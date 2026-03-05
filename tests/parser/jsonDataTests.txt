@@ -1,0 +1,118 @@
+!! options
+version=2
+!! end
+
+!! article
+Mustache:Attribute
+!! text
+<div>
+<h2>{{ person.name }}</h2>
+<div>{{ person.age }}</div>
+</div>
+!! endarticle
+
+!! test
+JSON parsing
+!! wikitext
+{{#mustache:Attribute
+| person = { "name": "Miraheze", "age": 10 }
+}}
+!! html
+<div>
+<h2>Miraheze</h2>
+<div>10</div>
+</div>
+!! end
+
+!! article
+Mustache:NestedLoop
+!! text
+<div>
+{{#matrix}}
+<div>{{#.}}{{.}} {{/.}}</div>
+{{/matrix}}
+</div>
+!! endarticle
+
+!! test
+Nested array loop
+!! wikitext
+{{#mustache:NestedLoop
+| matrix = [ [1, 2, 3], [4, 5, 6], [7, 8, 9] ]
+}}
+!! html
+<div>
+<div>1 2 3 </div>
+<div>4 5 6 </div>
+<div>7 8 9 </div>
+</div>
+!! end
+
+!! article
+Mustache:ComplexLoop
+!! text
+<div>
+{{#categories}}
+<h3>{{name}}</h3>
+<ul>{{#items}}<li>{{.}}</li>{{/items}}</ul>
+{{/categories}}
+</div>
+!! endarticle
+
+!! test
+Objects with array properties loop
+!! wikitext
+{{#mustache:ComplexLoop
+| categories = [ { "name": "Fruit", "items": ["Apple", "Banana"] }, { "name": "Color", "items": ["Red", "Blue"] } ]
+}}
+!! html
+<div>
+<h3>Fruit</h3>
+<ul><li>Apple</li><li>Banana</li></ul>
+<h3>Color</h3>
+<ul><li>Red</li><li>Blue</li></ul>
+</div>
+!! end
+
+!! article
+Module:JsonDataGenerator
+!! text
+local p = {}
+
+function p.getCatalog()
+    return [[{"categories":
+    	[
+    		{"name":"Electronics","items":[{"name":"Laptop","price":999,"inStock":true},{"name":"Phone","price":599,"inStock":false}]},
+    		{"name":"Books","items":[{"name":"Novel","price":19,"inStock":true}]}
+    	]
+    }]]
+end
+
+return p
+!! endarticle
+
+!! article
+Mustache:LuaDataTemplate
+!! text
+<div>
+{{#catalog.categories}}
+<h3>{{name}}</h3>
+<ul>{{#items}}<li>{{name}} - ${{price}} ({{#inStock}}In stock{{/inStock}}{{^inStock}}Out of stock{{/inStock}})</li>{{/items}}</ul>
+{{/catalog.categories}}
+</div>
+!! endarticle
+
+!! test
+Lua module data integration
+!! wikitext
+{{#mustache:LuaDataTemplate
+| catalog = {{#invoke:JsonDataGenerator|getCatalog}}
+}}
+!! html
+<div>
+<h3>Electronics</h3>
+<ul><li>Laptop - $999 (In stock)</li><li>Phone - $599 (Out of stock)</li></ul>
+<h3>Books</h3>
+<ul><li>Novel - $19 (In stock)</li></ul>
+</div>
+!! end

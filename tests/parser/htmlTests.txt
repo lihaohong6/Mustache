@@ -1,0 +1,41 @@
+!! options
+version=2
+!! end
+
+!! article
+Html:Complex
+!! text
+<div class="test">
+  <p>Content</p>
+  <style>
+  .test {
+	color: #eee;
+  }
+  </style>
+  <script>
+    console.log("{{{Loaded}}}");
+  </script>
+</div>
+!! endarticle
+
+!! test
+HTML with inline scripts
+!! wikitext
+<div>A</div>
+{{#html:Complex}}
+<div>B</div>
+!! html
+<div>A</div>
+<div class="test">
+  <p>Content</p>
+  <style>
+  .test {
+	color: #eee;
+  }
+  </style>
+  <script>
+    console.log("{{{Loaded}}}");
+  </script>
+</div>
+<div>B</div>
+!! end

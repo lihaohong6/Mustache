@@ -1,0 +1,78 @@
+{
+	"name": "Mustache",
+	"version": "1.0.0",
+	"author": "lihaohong6",
+	"url": "https://www.mediawiki.org/wiki/Extension:Mustache",
+	"descriptionmsg": "mustache-desc",
+	"license-name": "GPL-2.0-or-later",
+	"type": "parserhook",
+	"requires": {
+		"MediaWiki": ">= 1.45.0"
+	},
+	"namespaces": [
+		{
+			"id": 9200,
+			"constant": "NS_MUSTACHE",
+			"name": "Mustache",
+			"defaultcontentmodel": "mustache",
+			"subpages": false,
+			"protection": ["editsitecss", "editsitejs"]
+		},
+		{
+			"id": 9201,
+			"constant": "NS_MUSTACHE_TALK",
+			"name": "Mustache_talk",
+			"subpages": false
+		},
+		{
+			"id": 9210,
+			"constant": "NS_HTML",
+			"name": "Html",
+			"defaultcontentmodel": "html",
+			"subpages": false,
+			"protection": ["editsitecss", "editsitejs"]
+		},
+		{
+			"id": 9211,
+			"constant": "NS_HTML_TALK",
+			"name": "Html_talk",
+			"subpages": false
+		}
+	],
+	"attributes": {
+		"TemplateSandbox": {
+			"EditNamespaces": [
+				9200,
+				9210
+			]
+		}
+	},
+	"AutoloadNamespaces": {
+		"MediaWiki\\Extension\\Mustache\\ContentModels\\": "includes/ContentModels/",
+		"MediaWiki\\Extension\\Mustache\\": "includes/"
+	},
+	"TestAutoloadNamespaces": {
+		"MediaWiki\\Extension\\Mustache\\Tests\\": "tests/phpunit/"
+	},
+	"Hooks": {
+		"ParserFirstCallInit": "MediaWiki\\Extension\\Mustache\\MustacheHooks::onParserFirstCallInit",
+		"EditFilterMergedContent": "MediaWiki\\Extension\\Mustache\\MustacheHooks::onEditFilterMergedContent",
+		"ScribuntoExternalLibraries": "MediaWiki\\Extension\\Mustache\\MustacheHooks::addLuaLibrary",
+		"ParserAfterTidy": "MediaWiki\\Extension\\Mustache\\MustacheHooks::onParserAfterTidy"
+	},
+	"MessagesDirs": {
+		"Mustache": "i18n"
+	},
+	"ExtensionMessagesFiles": {
+		"MustacheMagic": "Mustache.i18n.php"
+	},
+	"ContentHandlers": {
+		"mustache": {
+			"class": "MediaWiki\\Extension\\Mustache\\ContentModels\\MustacheContentHandler"
+		},
+		"html": {
+			"class": "MediaWiki\\Extension\\Mustache\\ContentModels\\HtmlContentHandler"
+		}
+	},
+	"manifest_version": 2
+}

@@ -1,0 +1,130 @@
+!! options
+version=2
+!! end
+
+!! article
+Mustache:AttributeTemplate
+!! text
+<p id="{{id}}" class="{{cls}}">{{content}}</p>
+!! endarticle
+
+!! test
+Variables in HTML attributes
+!! wikitext
+{{#mustache:AttributeTemplate|id=test-id|cls=test-class|content=Text}}
+!! html
+<p id="test-id" class="test-class">Text</p>
+!! end
+
+!! article
+Mustache:ConditionalTemplate
+!! text
+{{#showContent}}<p>Visible content</p>{{/showContent}}
+{{^showContent}}<p>Hidden content</p>{{/showContent}}
+!! endarticle
+
+!! test
+Conditional sections
+!! wikitext
+{{#mustache:ConditionalTemplate|showContent=true}}{{#mustache:ConditionalTemplate}}
+!! html
+<p>Visible content</p>
+
+<p>Hidden content</p>
+!! end
+
+!! article
+Mustache:EmptyValueTemplate
+!! text
+{{#message}}<p>{{message}}</p>{{/message}}
+{{^message}}<p>No message</p>{{/message}}
+!! endarticle
+
+!! test
+Inverted section for empty value
+!! wikitext
+{{#mustache:EmptyValueTemplate|message=Test}}{{#mustache:EmptyValueTemplate}}
+!! html
+<p>Test</p>
+
+<p>No message</p>
+!! end
+
+!! article
+Mustache:EscapedTemplate
+!! text
+<p>{{htmlContent}}</p>
+!! endarticle
+
+!! test
+HTML escaping
+!! wikitext
+{{#mustache:EscapedTemplate|htmlContent=<script>alert(1)</script>}}
+!! html
+<p>&lt;script&gt;alert(1)&lt;/script&gt;</p>
+!! end
+
+!! article
+Mustache:Href
+!! text
+<a href="{{test}}">Test</a>
+!! endarticle
+
+!! test
+Href escaping
+!! wikitext
+{{#mustache:Href|test=https://test.com}}
+{{#mustache:Href|test=javascript:console.log(document)}}
+!! html
+<a href="https://test.com">Test</a>
+<a href="">Test</a>
+!! end
+
+!! article
+Mustache:UnquotedAttribute
+!! text
+<div style={{test}}></div>
+<div style=abc{{test}}></div>
+!! endarticle
+
+!! test
+Unquoted attribute
+!! wikitext
+{{#mustache:UnquotedAttribute|test=a onclick=alert(1)}}
+!! html
+<div style="a" onclick&#x3d;alert(1)=""></div>
+<div style="abca" onclick&#x3d;alert(1)=""></div>
+!! end
+
+# Should never happen because this template will be
+!! article
+Mustache:RawInterp
+!! text
+<div>{{{test}}}</div>
+<div>{{&test}}</div>
+!! endarticle
+
+!! test
+Raw interpolation
+!! wikitext
+{{#mustache:RawInterp|test=<script>alert(1)</script>}}
+!! html
+<div><script>alert(1)</script></div>
+<div><script>alert(1)</script></div>
+!! end
+
+# Interface XSS test. Random will be proud.
+!! article
+MediaWiki:mustache-error-no-template
+!! text
+<script>alert("xss")</script>
+!! endarticle
+
+!! test
+Sanitize interface messages
+!! wikitext
+{{#html:}}
+!! html
+<p><span class="error">&lt;script&gt;alert("xss")&lt;/script&gt;</span>
+</p>
+!! end
