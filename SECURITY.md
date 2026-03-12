@@ -2,6 +2,9 @@ If you find any security vulnerabilities, please report to this GitHub repositor
 
 The Mustache template has a rather complex threat model.
 
+## SSTI
+Mustache is logicless, which reduces the chance of SSTI induced RCE. The Mustache engine is further locked down: partials and lambdas are not allowed.
+
 ## Trusted Administrators vs Unprivileged Editors
 **Trusted admins** (with both `editsitecss` and `editsitejs` permissions, usually interface administrators) are considered fully trusted because they already have the ability to execute arbitrary JavaScript and CSS across the entire site. Therefore, as Mustache template creators they may write arbitrary HTML, including:
 - Static JavaScript event handlers (e.g., `onclick="alert('XSS')"`)
