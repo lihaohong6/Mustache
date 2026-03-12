@@ -1,4 +1,4 @@
-If you find any security vulnerabilities, please report to this GitHub repository. I have never received security vulnerability emails from GitHub, so please reach out to me via email or some other means if yuu don't see a reply within a few days.
+If you find any security vulnerabilities, please report to this GitHub repository. I have never received security vulnerability emails from GitHub, so please reach out to me via email or some other means if you don't see a reply within a few days.
 
 The Mustache template has a rather complex threat model.
 
