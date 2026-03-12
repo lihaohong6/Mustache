@@ -58,7 +58,8 @@
 		"ParserFirstCallInit": "MediaWiki\\Extension\\Mustache\\MustacheHooks::onParserFirstCallInit",
 		"EditFilterMergedContent": "MediaWiki\\Extension\\Mustache\\MustacheHooks::onEditFilterMergedContent",
 		"ScribuntoExternalLibraries": "MediaWiki\\Extension\\Mustache\\MustacheHooks::addLuaLibrary",
-		"ParserAfterTidy": "MediaWiki\\Extension\\Mustache\\MustacheHooks::onParserAfterTidy"
+		"ParserAfterTidy": "MediaWiki\\Extension\\Mustache\\MustacheHooks::onParserAfterTidy",
+		"CodeEditorGetPageLanguage": "MediaWiki\\Extension\\Mustache\\MustacheCodeEditorHooks::onCodeEditorGetPageLanguage"
 	},
 	"MessagesDirs": {
 		"Mustache": "i18n"
