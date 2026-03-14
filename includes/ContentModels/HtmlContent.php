@@ -10,4 +10,9 @@ class HtmlContent extends TextContent
     {
         parent::__construct($text, 'html');
     }
+
+	public function isValid(): bool {
+		// Do not validate HTML for now.
+		return true;
+	}
 }

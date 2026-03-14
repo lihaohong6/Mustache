@@ -9,6 +9,7 @@
 	"mustache-error-no-template": "No mustache template specified",
 	"mustache-error-invalid-template": "Invalid mustache template name: [[$1]]",
 	"mustache-error-template-not-found": "Mustache template not found or empty: [[$1]]",
+	"mustache-error-wrong-content-model": "Mustache template [[$1]] has the wrong content model",
 	"mustache-error-raw-interpolation": "Raw interpolation using {{{ or {{& and Set Delimiter tag {{= are not allowed in Mustache templates for security reasons. ",
 	"mustache-error-script-interpolation": "Mustache syntax inside &lt;script&gt; tags is not allowed for security reasons. If you need to pass data to JS, use data-* attributes and parse them with JS instead.",
 	"mustache-error-style-interpolation": "Mustache syntax inside &lt;style&gt; tags is not allowed for security reasons. If you need to customize the stylesheet, use data-* attributes to pass data and insert styles with JS instead.",

@@ -10,7 +10,13 @@ use MediaWiki\Title\Title;
 
 class MustacheUtils {
 
-	public static function loadTemplateContent( string $name, int $namespace, ?Parser $parser = null ): array {
+	private static array $namespaceToContentModel = [
+		NS_MUSTACHE => CONTENT_MODEL_MUSTACHE,
+		NS_HTML => CONTENT_MODEL_HTML,
+	];
+
+	public static function loadTemplateContent( string $name, int $namespace, Parser $parser ): array {
+
 		$name = trim( $name );
 
 		if ( empty( $name ) ) {
@@ -33,20 +39,8 @@ class MustacheUtils {
 
 		$titleText = $title->getFullText();
 
-		if ( $parser !== null ) {
-			$revRecord = $parser->fetchCurrentRevisionRecordOfTitle( $title );
-			if ( $revRecord ) {
-				$content = $revRecord->getContent( SlotRecord::MAIN );
-				if ( $content ) {
-					return [
-						'success' => true,
-						'content' => $content->getText()
-					];
-				}
-			}
-		}
-
-		if ( !$title->exists() ) {
+		$revRecord = $parser->fetchCurrentRevisionRecordOfTitle( $title );
+		if ( !$revRecord ) {
 			return [
 				'success' => false,
 				'errorType' => 'template-not-found',
@@ -54,17 +48,20 @@ class MustacheUtils {
 			];
 		}
 
-		$wikiPage = MediaWikiServices::getInstance()
-									 ->getWikiPageFactory()
-									 ->newFromTitle( $title );
-
-		$content = $wikiPage->getContent();
-
+		$content = $revRecord->getContent( SlotRecord::MAIN );
 		if ( !$content ) {
 			return [
 				'success' => false,
 				'errorType' => 'template-not-found',
-				'name' => htmlspecialchars( $name )
+				'name' => htmlspecialchars( $titleText )
+			];
+		}
+
+		if ( MustacheUtils::$namespaceToContentModel[ $namespace ] !== $content->getModel() ) {
+			return [
+				'success' => false,
+				'errorType' => 'wrong-content-model',
+				'name' => htmlspecialchars( $titleText ),
 			];
 		}
 

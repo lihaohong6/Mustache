@@ -4,6 +4,8 @@ namespace MediaWiki\Extension\Mustache\ContentModels;
 
 use MediaWiki\Content\Content;
 use MediaWiki\Content\TextContentHandler;
+use MediaWiki\Content\ValidationParams;
+use StatusValue;
 
 class HtmlContentHandler extends TextContentHandler {
 	public function __construct() {
@@ -20,6 +22,11 @@ class HtmlContentHandler extends TextContentHandler {
 
 	public function isSupportedFormat( $format ): bool {
 		return true;
+	}
+
+	public function validateSave( Content $content, ValidationParams $validationParams ): StatusValue {
+		// Do not validate HTML for now.
+		return StatusValue::newGood();
 	}
 
 	public function serializeContent( Content $content, $format = null ) {

@@ -54,6 +54,7 @@
 	"TestAutoloadNamespaces": {
 		"MediaWiki\\Extension\\Mustache\\Tests\\": "tests/phpunit/"
 	},
+	"callback": "MediaWiki\\Extension\\Mustache\\MustacheHooks::onRegistration",
 	"Hooks": {
 		"ParserFirstCallInit": "MediaWiki\\Extension\\Mustache\\MustacheHooks::onParserFirstCallInit",
 		"EditFilterMergedContent": "MediaWiki\\Extension\\Mustache\\MustacheHooks::onEditFilterMergedContent",

@@ -4,6 +4,9 @@ namespace MediaWiki\Extension\Mustache\ContentModels;
 
 use MediaWiki\Content\Content;
 use MediaWiki\Content\TextContentHandler;
+use MediaWiki\Content\ValidationParams;
+use MediaWiki\Extension\Mustache\MustacheValidator;
+use StatusValue;
 
 class MustacheContentHandler extends TextContentHandler {
 
@@ -32,9 +35,20 @@ class MustacheContentHandler extends TextContentHandler {
 		return true;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
+	public function validateSave( Content $content, ValidationParams $validationParams ): StatusValue {
+		$template = $content->getText();
+		$errors = MustacheValidator::validateTemplate( $template );
+
+		$status = StatusValue::newGood();
+		if ( $errors ) {
+			foreach ( $errors as $error ) {
+				$status->fatal( new \RawMessage( '$1', [ $error ] ) );
+			}
+		}
+
+		return $status;
+	}
+
 	public function serializeContent( Content $content, $format = null ) {
 		return parent::serializeContent( $content, CONTENT_FORMAT_HTML );
 	}

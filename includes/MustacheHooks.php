@@ -9,6 +9,11 @@ use RawMessage;
 
 class MustacheHooks {
 
+	public static function onRegistration(): void {
+		define( 'CONTENT_MODEL_HTML', 'html' );
+		define( 'CONTENT_MODEL_MUSTACHE', 'mustache' );
+	}
+
 	public static function onParserFirstCallInit( Parser $parser ): void {
 		$parser->setFunctionHook(
 			'mustache',
