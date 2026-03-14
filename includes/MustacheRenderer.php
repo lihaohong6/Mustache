@@ -54,9 +54,7 @@ class MustacheRenderer {
 
 	public static function storeHtmlWithMarker( Parser $parser, string $html ): string {
 		$marker = self::$markerPrefix . wfRandomString( 16 ) . self::$markerSuffix;
-		$mustacheRenderings = $parser->getOutput()->getExtensionData( 'mustacheRenderings' ) ?: [];
-		$mustacheRenderings[$marker] = $html;
-		$parser->getOutput()->setExtensionData( 'mustacheRenderings', $mustacheRenderings );
+		$parser->getOutput()->appendExtensionData( 'mustacheRenderings', $marker . '|' . $html );
 		return $marker;
 	}
 }

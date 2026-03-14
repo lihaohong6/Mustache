@@ -99,7 +99,11 @@ class MustacheHooks {
 		if ( !is_array( $replacements ) ) {
 			return;
 		}
-		foreach ( $replacements as $marker => $html ) {
+		foreach ( $replacements as $replacement => $boolValue ) {
+			[
+				$marker,
+				$html
+			] = explode( '|', $replacement, 2 );
 			$text = str_replace( $marker, $html, $text );
 		}
 	}

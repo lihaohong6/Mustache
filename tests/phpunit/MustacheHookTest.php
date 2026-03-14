@@ -173,7 +173,7 @@ class MustacheHookTest extends MediaWikiIntegrationTestCase {
 		$parser = $this->createMock( Parser::class );
 		$marker1 = '<div>​MUSTACHE_test1_END</div>';
 		$marker2 = '<div>​MUSTACHE_test2_END</div>';
-		$html1 = '<div class="rendered-1">Content 1</div>';
+		$html1 = '<div class="rendered-1">Content 1|</div>';
 		$html2 = '<div class="rendered-2">Content 2</div>';
 
 		$text = "<p>Before $marker1 Middle $marker2 After</p>";
@@ -182,7 +182,7 @@ class MustacheHookTest extends MediaWikiIntegrationTestCase {
 		$parserOutput->expects( $this->once() )
 			->method( 'getExtensionData' )
 			->with( 'mustacheRenderings' )
-			->willReturn( [ $marker1 => $html1, $marker2 => $html2 ] );
+			->willReturn( [ $marker1 . '|' . $html1 => true, $marker2 . '|' . $html2 => true ] );
 
 		$parser->expects( $this->once() )
 			->method( 'getOutput' )
