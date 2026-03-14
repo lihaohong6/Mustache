@@ -7,7 +7,7 @@ use MediaWiki\Content\TextContent;
 class MustacheContent extends TextContent {
 
 	public function __construct( $text ) {
-		parent::__construct( $text, 'mustache' );
+		parent::__construct( $text, CONTENT_MODEL_MUSTACHE );
 	}
 
 	public function isValid(): bool {

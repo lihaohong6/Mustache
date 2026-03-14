@@ -5,6 +5,7 @@ namespace MediaWiki\Extension\Mustache\ContentModels;
 use MediaWiki\Content\Content;
 use MediaWiki\Content\TextContentHandler;
 use MediaWiki\Content\ValidationParams;
+use MediaWiki\Exception\MWContentSerializationException;
 use MediaWiki\Extension\Mustache\MustacheValidator;
 use StatusValue;
 
@@ -51,5 +52,16 @@ class MustacheContentHandler extends TextContentHandler {
 
 	public function serializeContent( Content $content, $format = null ) {
 		return parent::serializeContent( $content, CONTENT_FORMAT_HTML );
+	}
+
+	public function importTransform( $blob, $format = null ) {
+		$errors = MustacheValidator::validateTemplate( $blob );
+		if ( !empty( $errors ) ) {
+			throw new MWContentSerializationException(
+				wfMessage( 'mustache-import-error-invalid-content' )
+					->inContentLanguage()->text()
+			);
+		}
+		return $blob;
 	}
 }

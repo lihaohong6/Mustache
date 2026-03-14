@@ -96,23 +96,6 @@ Unquoted attribute
 <div style="abca" onclick&#x3d;alert(1)=""></div>
 !! end
 
-# Should never happen because this template will be
-!! article
-Mustache:RawInterp
-!! text
-<div>{{{test}}}</div>
-<div>{{&test}}</div>
-!! endarticle
-
-!! test
-Raw interpolation
-!! wikitext
-{{#mustache:RawInterp|test=<script>alert(1)</script>}}
-!! html
-<div><script>alert(1)</script></div>
-<div><script>alert(1)</script></div>
-!! end
-
 # Interface XSS test. Random will be proud.
 !! article
 MediaWiki:mustache-error-no-template

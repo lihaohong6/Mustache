@@ -2,10 +2,12 @@
 
 namespace MediaWiki\Extension\Mustache;
 
-use MediaWiki\Extension\Mustache\ContentModels\MustacheContent;
+use MediaWiki\Content\ValidationParams;
+use MediaWiki\MediaWikiServices;
+use MediaWiki\Page\PageIdentityValue;
 use MediaWiki\Parser\Parser;
 use MediaWiki\Parser\PPFrame;
-use RawMessage;
+use MediaWiki\Revision\SlotRecord;
 
 class MustacheHooks {
 
@@ -86,36 +88,51 @@ class MustacheHooks {
 		return MustacheRenderer::storeHtmlWithMarker( $parser, $html );
 	}
 
-	public static function onEditFilterMergedContent(
-		$context,
-		$content,
-		$status,
-		$summary,
+	public static function onMultiContentSaveTest(
+		$renderedRevision,
 		$user,
-		$minoredit
+		$summary,
+		$flags,
+		$status
 	) {
-		$title = $context->getTitle();
-
-		if ( $title->getNamespace() !== NS_MUSTACHE ) {
+		// IMPORTANT: this function is deliberately unused (not included in extension.json) because its features overlap
+		// with existing functions (validateSave).
+		$revision = $renderedRevision->getRevision();
+		$content = $revision->getContent( SlotRecord::MAIN );
+		if ( $content->getModel() !== CONTENT_MODEL_MUSTACHE && $content->getModel() !== CONTENT_MODEL_HTML ) {
 			return true;
 		}
+		// Prevents users from touching Mustache content model pages outside of Mustache namespace
+		// Isn't really necessary because Mustache parser function calls are restricted to a particular namespace
+		$services = MediaWikiServices::getInstance();
+		$permissionManager = $services->getPermissionManager();
+		$canEditSiteCss = $permissionManager->userHasRight( $user, 'editsitecss' );
+		$canEditSiteJs = $permissionManager->userHasRight( $user, 'editsitejs' );
 
-		if ( !( $content instanceof MustacheContent ) ) {
-			return true;
-		}
-
-		$template = $content->getText();
-		$errors = MustacheValidator::validateTemplate( $template );
-
-		if ( $errors ) {
-			$status->setOK( false );
-			foreach ( $errors as $error ) {
-				$status->fatal( new RawMessage( '$1', [ $error ] ) );
-			}
+		if ( !$canEditSiteCss || !$canEditSiteJs ) {
+			$status->fatal( 'mustache-error-permission-denied' );
 			return false;
 		}
 
-		return true;
+		// No validation required beyond this point. The validateSave hook in MustacheContentHandler
+		// will take care of the rest.
+		$handler = $content->getContentHandler();
+		// MW expects a page identity. We know that validateSave doesn't need the page identity but provide one
+		// to satisfy the linter anyway. Extremely dumb. The alternative is to make separate function calls but that
+		// would duplicate functionality.
+		$fakePageIdentity = new PageIdentityValue( 0, NS_MUSTACHE, "Test", false );
+		$handlerStatus = $handler->validateSave(
+			$content,
+			new ValidationParams( $fakePageIdentity, $flags ) );
+
+		if ( $handlerStatus->isOK() ) {
+			return true;
+		}
+
+		foreach ( $handlerStatus->getMessages() as $msg ) {
+			$status->fatal( $msg );
+		}
+		return false;
 	}
 
 	public static function addLuaLibrary( $engine, &$extraLibraries ) {

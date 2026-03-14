@@ -2,10 +2,7 @@
 	"@metadata": {
 		"authors": []
 	},
-	"mustache-desc": "{{doc-important|Do not translate \"{{#mustache:}}\"}}\n\nShort description of the Mustache functionality of this extension.",
-	"html-desc": "{{doc-important|Do not translate \"{{#html:}}\"}}\n\nShort description of the HTML functionality of this extension.",
-	"html-protected": "Error message shown when a user tries to edit an HTML page without having both the editsitecss and editsitejs permissions.",
-	"mustache-protected": "Error message shown when a user tries to edit a Mustache template without having both the editsitecss and editsitejs permissions.",
+	"mustache-desc": "Short description of this extension.",
 	"mustache-error-no-template": "Error message shown when {{#mustache:}} is used without specifying a template name.",
 	"mustache-error-invalid-template": "Error message shown when an invalid template name is provided to {{#mustache:}}.\n\nParameters:\n* $1 - the invalid template name",
 	"mustache-error-template-not-found": "Error message shown when a specified Mustache template does not exist.\n\nParameters: $1 - the template name that was not found",

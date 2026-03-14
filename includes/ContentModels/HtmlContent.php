@@ -6,9 +6,8 @@ use MediaWiki\Content\TextContent;
 
 class HtmlContent extends TextContent
 {
-    public function __construct($text)
-    {
-        parent::__construct($text, 'html');
+    public function __construct($text) {
+        parent::__construct($text, CONTENT_MODEL_HTML );
     }
 
 	public function isValid(): bool {

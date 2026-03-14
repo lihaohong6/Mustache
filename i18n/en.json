@@ -3,9 +3,6 @@
 		"authors": []
 	},
 	"mustache-desc": "Allows trusted users to create raw HTML snippets and mustache templates that can be used on content pages with the {{#mustache:}} and {{#html:}} parser functions.",
-	"html-desc": "Adds {{#html:}} parser function for including raw HTML pages",
-	"html-protected": "You need both <code>editsitecss</code> and <code>editsitejs</code> rights to edit HTML pages.",
-	"mustache-protected": "You need both <code>editsitecss</code> and <code>editsitejs</code> rights to edit Mustache templates.",
 	"mustache-error-no-template": "No mustache template specified",
 	"mustache-error-invalid-template": "Invalid mustache template name: [[$1]]",
 	"mustache-error-template-not-found": "Mustache template not found or empty: [[$1]]",
@@ -14,5 +11,7 @@
 	"mustache-error-script-interpolation": "Mustache syntax inside &lt;script&gt; tags is not allowed for security reasons. If you need to pass data to JS, use data-* attributes and parse them with JS instead.",
 	"mustache-error-style-interpolation": "Mustache syntax inside &lt;style&gt; tags is not allowed for security reasons. If you need to customize the stylesheet, use data-* attributes to pass data and insert styles with JS instead.",
 	"mustache-error-dangerous-attribute": "Mustache syntax is not permitted in attribute \"$1\" of tag \"$2\" for security reasons. If you need to customize this attribute, use data-* attributes to pass data and insert attributes with JS instead.",
-	"mustache-error-attribute-name-interpolation": "Mustache syntax is not permitted in attribute names of tag \"$1\"."
+	"mustache-error-attribute-name-interpolation": "Mustache syntax is not permitted in attribute names of tag \"$1\".",
+	"mustache-error-permission-denied": "You need both <code>editsitecss</code> and <code>editsitejs</code> rights to edit mustache templates or raw html.",
+	"mustache-import-error-invalid-content": "An imported Mustache template contains invalid content."
 }
