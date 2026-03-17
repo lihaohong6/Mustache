@@ -1,0 +1,177 @@
+!! options
+version=2
+!! end
+
+!! article
+Mustache:Person
+!! text
+<div>
+<h2>{{ person.name }}</h2>
+<div>{{ person.age }}</div>
+</div>
+!! endarticle
+
+!! test
+Custom format - simple object
+!! wikitext
+{{#mustache:Person
+| person = { name = John, age = 30 }
+}}
+!! html
+<div>
+<h2>John</h2>
+<div>30</div>
+</div>
+!! end
+
+!! article
+Mustache:FruitList
+!! text
+<ul>
+{{#items}}<li>{{.}}</li>{{/items}}
+</ul>
+!! endarticle
+
+!! test
+Custom format - simple array
+!! wikitext
+{{#mustache:FruitList
+| items = [ apple, banana, orange ]
+}}
+!! html
+<ul>
+<li>apple</li><li>banana</li><li>orange</li>
+</ul>
+!! end
+
+!! article
+Mustache:UserProfile
+!! text
+<div>
+<h3>{{ user.name }}</h3>
+<p>Email: {{ user.email }}</p>
+<p>Address: {{ user.address.street }}, {{ user.address.city }}</p>
+</div>
+!! endarticle
+
+!! test
+Custom format - nested object
+!! wikitext
+{{#mustache:UserProfile
+| user = { name = "Jane Doe", email = jane@example.com, address = { street = "123 Main St", city = "New York" } }
+}}
+!! html
+<div>
+<h3>Jane Doe</h3>
+<p>Email: jane@example.com</p>
+<p>Address: 123 Main St, New York</p>
+</div>
+!! end
+
+!! article
+Mustache:ProductList
+!! text
+<div>
+{{#products}}
+<div>
+<h4>{{name}}</h4>
+<p>Price: ${{price}}</p>
+<p>In stock: {{inStock}}</p>
+</div>
+{{/products}}
+</div>
+!! endarticle
+
+!! test
+Custom format - array of objects
+!! wikitext
+{{#mustache:ProductList
+| products = [ { name = Laptop, price = 999, inStock = true }, { name = Phone, price = 599, inStock = false } ]
+}}
+!! html
+<div>
+<div>
+<h4>Laptop</h4>
+<p>Price: $999</p>
+<p>In stock: true</p>
+</div>
+<div>
+<h4>Phone</h4>
+<p>Price: $599</p>
+<p>In stock: false</p>
+</div>
+</div>
+!! end
+
+!! article
+Mustache:MatrixDisplay
+!! text
+<div>
+{{#rows}}
+<div>{{#.}}{{.}} {{/.}}</div>
+{{/rows}}
+</div>
+!! endarticle
+
+!! test
+Custom format - nested arrays
+!! wikitext
+{{#mustache:MatrixDisplay
+| rows = [ [ 1, 2, 3 ], [ 4, 5, 6 ], [ 7, 8, 9 ] ]
+}}
+!! html
+<div>
+<div>1 2 3 </div>
+<div>4 5 6 </div>
+<div>7 8 9 </div>
+</div>
+!! end
+
+!! article
+Mustache:Catalog
+!! text
+<div>
+{{#categories}}
+<h3>{{name}}</h3>
+<ul>
+{{#items}}<li>{{.}}</li>{{/items}}
+</ul>
+{{/categories}}
+</div>
+!! endarticle
+
+!! test
+Custom format - complex nested structure
+!! wikitext
+{{#mustache:Catalog
+| categories = [ { name = Fruit, items = [ Apple, Banana ] }, { name = Color, items = [ Red, Blue ] } ]
+}}
+!! html
+<div>
+<h3>Fruit</h3>
+<ul>
+<li>Apple</li><li>Banana</li>
+</ul>
+<h3>Color</h3>
+<ul>
+<li>Red</li><li>Blue</li>
+</ul>
+</div>
+!! end
+
+!! article
+Mustache:Simple
+!! text
+<div>{{message}}</div>
+!! endarticle
+
+!! test
+Custom format backward compatibility - simple string still works
+!! wikitext
+{{#mustache:Simple
+| message = Hello World
+}}
+!! html
+<div>Hello World</div>
+!! end
+

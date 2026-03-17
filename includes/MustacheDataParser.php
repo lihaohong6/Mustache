@@ -23,7 +23,7 @@ class MustacheDataParser {
 	}
 
 	/**
-	 * Parse a value, detecting and decoding JSON if present.
+	 * Parse a value, detecting and decoding JSON or custom format if present.
 	 *
 	 * @param string $value The value to parse
 	 * @return array An array where the first value is a string or array, representing the parsed value.
@@ -39,11 +39,22 @@ class MustacheDataParser {
 		$firstChar = $trimmed[0];
 		$lastChar = $trimmed[strlen( $trimmed ) - 1];
 
-		$hasJsonDelimiters = ( $firstChar === '{' && $lastChar === '}' ) ||
+		$hasDelimiters = ( $firstChar === '{' && $lastChar === '}' ) ||
 			( $firstChar === '[' && $lastChar === ']' );
 
-		if ( !$hasJsonDelimiters ) {
+		if ( !$hasDelimiters ) {
 			return [ $value ];
+		}
+
+		[
+			$result,
+			$error
+		] = MustacheCustomParser::parse( $trimmed );
+
+		if ( $result !== null ) {
+			return [
+				$result
+			];
 		}
 
 		$decoded = json_decode( $trimmed, true );
@@ -52,18 +63,18 @@ class MustacheDataParser {
 			return [ $decoded ];
 		}
 
-		$unescaped = html_entity_decode( $trimmed, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
-		$decoded = json_decode( $unescaped, true );
+		$jsonError = json_last_error_msg();
 
-		if ( json_last_error() === JSON_ERROR_NONE ) {
-			return [ $decoded ];
+		if ( str_contains( $trimmed, '":' ) || str_contains( $trimmed, '" {' ) || str_contains( $trimmed, '" [' ) ) {
+			return [
+				null,
+				"JSON parse error: $jsonError"
+			];
 		}
 
-		return [ '', self::getJsonErrorMessage() ];
-	}
-
-	private static function getJsonErrorMessage(): string {
-		$error = json_last_error_msg();
-		return '<span class="error">JSON parse error: ' . htmlspecialchars( $error ) . '</span>';
+		return [
+			null,
+			wfMessage( 'mustache-custom-format-parser-error', $error )->inContentLanguage()->text()
+		];
 	}
 }

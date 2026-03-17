@@ -196,4 +196,90 @@ class ArgumentParserTest extends MediaWikiIntegrationTestCase {
 		$this->assertEmpty( $result['simple'] );
 	}
 
+	/**
+	 * @covers MediaWiki\Extension\Mustache\MustacheDataParser::parseArguments
+	 */
+	public function testParseCustomFormatMultiWordValues() {
+		$args = [
+			'',
+			'items=[{name = Apple, value = $3 each}, {name = Banana, value = $1 each}, {name = Orange, value = $2 each}]'
+		];
+
+		$result = MustacheDataParser::parseArguments( $args );
+
+		$this->assertIsArray( $result['items'] );
+		$this->assertCount( 3, $result['items'] );
+		$this->assertSame( 'Apple', $result['items'][0]['name'] );
+		$this->assertSame( '$3 each', $result['items'][0]['value'] );
+		$this->assertSame( 'Banana', $result['items'][1]['name'] );
+		$this->assertSame( '$1 each', $result['items'][1]['value'] );
+		$this->assertSame( 'Orange', $result['items'][2]['name'] );
+		$this->assertSame( '$2 each', $result['items'][2]['value'] );
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\Mustache\MustacheDataParser::parseArguments
+	 */
+	public function testParseCustomFormatMixedWithJson() {
+		$args = [
+			'',
+			'title=Product List',
+			'items=[{name = Apple, value = $3 each}, {name = Banana, value = $1 each}]',
+			'meta={"count":2,"total":3}'
+		];
+
+		$result = MustacheDataParser::parseArguments( $args );
+
+		$this->assertSame( 'Product List', $result['title'] );
+		$this->assertIsArray( $result['items'] );
+		$this->assertCount( 2, $result['items'] );
+		$this->assertSame( 'Apple', $result['items'][0]['name'] );
+		$this->assertSame( '$3 each', $result['items'][0]['value'] );
+		$this->assertSame( 'Banana', $result['items'][1]['name'] );
+		$this->assertSame( '$1 each', $result['items'][1]['value'] );
+		$this->assertIsArray( $result['meta'] );
+		$this->assertSame( 2, $result['meta']['count'] );
+		$this->assertSame( 3, $result['meta']['total'] );
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\Mustache\MustacheDataParser::parseArguments
+	 */
+	public function testParseCustomFormatWithNestedStructures() {
+		$args = [
+			'',
+			'data={title = Test, products = [{name = Apple, price = $3 each}, {name = Banana, price = $1 each}]}'
+		];
+
+		$result = MustacheDataParser::parseArguments( $args );
+
+		$this->assertIsArray( $result['data'] );
+		$this->assertSame( 'Test', $result['data']['title'] );
+		$this->assertIsArray( $result['data']['products'] );
+		$this->assertCount( 2, $result['data']['products'] );
+		$this->assertSame( 'Apple', $result['data']['products'][0]['name'] );
+		$this->assertSame( '$3 each', $result['data']['products'][0]['price'] );
+		$this->assertSame( 'Banana', $result['data']['products'][1]['name'] );
+		$this->assertSame( '$1 each', $result['data']['products'][1]['price'] );
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\Mustache\MustacheDataParser::parseArguments
+	 */
+	public function testParseCustomFormatSpecialCharacters() {
+		$args = [
+			'',
+			'items=[{name = Product A, price = $99.99}, {name = Product B, price = $49.99!}]'
+		];
+
+		$result = MustacheDataParser::parseArguments( $args );
+
+		$this->assertIsArray( $result['items'] );
+		$this->assertCount( 2, $result['items'] );
+		$this->assertSame( 'Product A', $result['items'][0]['name'] );
+		$this->assertSame( '$99.99', $result['items'][0]['price'] );
+		$this->assertSame( 'Product B', $result['items'][1]['name'] );
+		$this->assertSame( '$49.99!', $result['items'][1]['price'] );
+	}
+
 }
