@@ -3,6 +3,7 @@
 	"description": "MediaWiki extension for Mustache templates",
 	"license": "GPL-2.0-or-later",
 	"require": {
-		"mustache/mustache": "^3.0"
+		"mustache/mustache": "^3.0",
+		"laktak/hjson": "^2.3"
 	}
 }

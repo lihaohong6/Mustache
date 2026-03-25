@@ -2,6 +2,9 @@
 
 namespace MediaWiki\Extension\Mustache;
 
+use HJSON\HJSONException;
+use HJSON\HJSONParser;
+
 class MustacheDataParser {
 
 	public static function parseArguments( array $args ): array {
@@ -46,24 +49,12 @@ class MustacheDataParser {
 			return [ $value ];
 		}
 
-		$decoded = json_decode( $trimmed, true );
-
-		if ( json_last_error() === JSON_ERROR_NONE ) {
-			return [ $decoded ];
+		$parser = new HJSONParser();
+		try {
+			$decoded = $parser->parse( $trimmed, [ 'associative' => true ] );
+		} catch ( HJSONException $e ) {
+			return [ '', '<span class="error">' . htmlspecialchars( $e->getMessage() ) . '</span>' ];
 		}
-
-		$unescaped = html_entity_decode( $trimmed, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
-		$decoded = json_decode( $unescaped, true );
-
-		if ( json_last_error() === JSON_ERROR_NONE ) {
-			return [ $decoded ];
-		}
-
-		return [ '', self::getJsonErrorMessage() ];
-	}
-
-	private static function getJsonErrorMessage(): string {
-		$error = json_last_error_msg();
-		return '<span class="error">JSON parse error: ' . htmlspecialchars( $error ) . '</span>';
+		return [ $decoded ];
 	}
 }
