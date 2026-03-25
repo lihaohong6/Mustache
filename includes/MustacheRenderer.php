@@ -18,14 +18,17 @@ class MustacheRenderer {
 	public static function render( string $template, array $data ): string {
 		$engine = new Engine( [
 			'entity_flags' => ENT_QUOTES,
-			'lambdas' => false,
+			// Lambdas required by PRAGMA_FILTERS
+			'lambdas' => true,
 			'dynamic_names' => false,
 			'inheritance' => false,
 			'strict_callables' => true,
-			'escape' => function ($value) {
-				$escaped = htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-				return str_replace('=', '&#x3D;', $escaped);
-			}
+			'pragmas' => [ Engine::PRAGMA_FILTERS ],
+			'helpers' => MustacheFilters::getBuiltinFilters(),
+			'escape' => function ( $value ) {
+				$escaped = htmlspecialchars( $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' );
+				return str_replace( '=', '&#x3D;', $escaped );
+			},
 		] );
 		$rendered = $engine->render( $template, $data );
 		return self::sanitizeRenderedTemplate( $rendered );

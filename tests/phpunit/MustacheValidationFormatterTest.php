@@ -67,6 +67,77 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 	/**
 	 * @covers MediaWiki\Extension\Mustache\MustacheValidationFormatter
 	 */
+	public function testScriptTagWithJsFiltersAllowed() {
+		$templates = [
+			'js-string filter'          => '<script>var x = "{{ value|js-string }}";</script>',
+			'js-number filter'          => '<script>var n = {{ count|js-number }};</script>',
+			'js-identifier filter'      => '<script>var {{ name|js-identifier }} = 1;</script>',
+			'js-string in function'     => '<script>function f() { alert("{{ msg|js-string }}"); }</script>',
+			'section inside script'     => '<script>{{#items}}var {{ name|js-identifier }} = 1;{{/items}}</script>',
+		];
+
+		foreach ( $templates as $description => $template ) {
+			$errors = MustacheValidator::validateTemplate( $template );
+			$this->assertEmpty( $errors, "Script tag with JS filter should be allowed: $description" );
+		}
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\Mustache\MustacheValidationFormatter
+	 */
+	public function testStyleTagWithCssFiltersAllowed() {
+		$templates = [
+			'css-id for class selector'    => '<style>.{{ cls|css-id }} { color: red; }</style>',
+			'css-id for id selector'       => '<style>#{{ id|css-id }} { font-size: 16px; }</style>',
+			'css-value for property value' => '<style>.foo { color: {{ color|css-value }}; }</style>',
+			'section inside style'         => '<style>{{#themes}}.{{ name|css-id }} { color: red; }{{/themes}}</style>',
+		];
+
+		foreach ( $templates as $description => $template ) {
+			$errors = MustacheValidator::validateTemplate( $template );
+			$this->assertEmpty( $errors, "Style tag with CSS filter should be allowed: $description" );
+		}
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\Mustache\MustacheValidationFormatter
+	 */
+	public function testUnknownFilterBlocked() {
+		$templates = [
+			'Unknown filter in attribute' => '<div class="{{ cls|unknown-filter }}">text</div>',
+			'Unknown filter in script'    => '<script>var x = "{{ val|unknown }}";</script>',
+			'Unknown filter in style'     => '<style>.{{ cls|not-a-filter }} {}</style>',
+			'Unknown filter in body'      => '<div>{{ value|custom }}</div>',
+		];
+
+		foreach ( $templates as $description => $template ) {
+			$errors = MustacheValidator::validateTemplate( $template );
+			$this->assertNotEmpty( $errors, "Unknown filter should be blocked: $description" );
+			$errorString = implode( ' ', $errors );
+			$this->assertStringContainsStringIgnoringCase( 'filter', $errorString, "Error should mention filter: $description" );
+		}
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\Mustache\MustacheValidationFormatter
+	 */
+	public function testWrongContextFilterBlocked() {
+		$templates = [
+			'CSS filter in script'    => '<script>var x = "{{ val|css-id }}";</script>',
+			'JS filter in style'      => '<style>.{{ cls|js-string }} {}</style>',
+			'url filter in script'    => '<script>var x = "{{ u|url }}";</script>',
+			'plain-text in script'    => '<script>var x = "{{ t|plain-text }}";</script>',
+		];
+
+		foreach ( $templates as $description => $template ) {
+			$errors = MustacheValidator::validateTemplate( $template );
+			$this->assertNotEmpty( $errors, "Wrong-context filter should be blocked: $description" );
+		}
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\Mustache\MustacheValidationFormatter
+	 */
 	public function testDangerousAttributeInterpolationBlocked() {
 		$templates = [
 			'onclick attribute' => '<div onclick="{{action}}">text</div>',
@@ -93,6 +164,7 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 			'data-* attribute' => '<div data-value="{{val}}">text</div>',
 			'aria-* attribute' => '<div aria-label="{{label}}">text</div>',
 			'multiple safe attributes' => '<div id="{{id}}" class="{{cls}}" data-x="{{x}}">text</div>',
+			'known filter in attribute' => '<div class="{{ cls|css-id }}">text</div>',
 		];
 
 		foreach ( $templates as $description => $template ) {
@@ -109,6 +181,8 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 			'Static script tag' => '<script>alert("XSS");</script>',
 			'Static onclick handler' => '<div onclick="alert(1)">click</div>',
 			'Static style tag' => '<style>body { color: red; }</style>',
+			'Script with only section markers' => '<script>{{#items}}var x = 1;{{/items}}</script>',
+			'Script with only comment' => '<script>{{! this is a comment }}var x = 1;</script>',
 		];
 
 		foreach ( $templates as $description => $template ) {

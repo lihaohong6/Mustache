@@ -7,24 +7,39 @@ use Wikimedia\RemexHtml\Serializer\SerializerNode;
 
 class MustacheValidationFormatter extends RemexCompatFormatter {
 
+	// Tags in which interpolation is restricted to designated filters
+	private array $restrictedTags;
+
 	private array $errors = [];
 
-	public function __construct( array $options = [] ) {
+	public function __construct( array $options = [], array $filters = [] ) {
 		parent::__construct( $options );
 		$this->errors = [];
+		$filters = MustacheFilters::getBuiltinFilters();
+		$allowedFilters = array_keys( $filters );
+		$this->restrictedTags = [
+			'style' => array_filter( $allowedFilters, static function ( $filter ) {
+				return str_starts_with( $filter, 'css' );
+			} ),
+			'script' => array_filter( $allowedFilters, static function ( $filter ) {
+				return str_starts_with( $filter, 'js' );
+			})
+		];
 	}
 
 	public function characters( SerializerNode $parent, $text, $start, $length ) {
-		$actualText = substr( $text, $start, $length );
-
 		$parentTag = strtolower( $parent->name ?? '' );
-		$noInterpolationTags = [
-			'script' => true,
-			'style' => true,
-		];
 
-		if ( isset( $noInterpolationTags[ $parentTag ]) && str_contains( $actualText, '{{' ) ) {
-			$this->errors["$parentTag-interpolation"][] = "";
+		if ( isset( $this->restrictedTags[$parentTag] ) ) {
+			$actualText = substr( $text, $start, $length );
+			$requiredFilters = $this->restrictedTags[$parentTag];
+
+			foreach ( MustacheFilters::parseInterpolations( $actualText ) as [$varName, $filters] ) {
+				// In restricted contexts, require at least one filter from the appropriate family.
+				if ( empty( array_intersect( $filters, $requiredFilters ) ) ) {
+					$this->errors["$parentTag-interpolation"][] = '';
+				}
+			}
 		}
 
 		return parent::characters( $parent, $text, $start, $length );
@@ -36,12 +51,19 @@ class MustacheValidationFormatter extends RemexCompatFormatter {
 		foreach ( $node->attrs->getValues() as $attrName => $attrValue ) {
 			$attrNameLower = strtolower( $attrName );
 
-			if ( str_contains( $attrName, '{{') ) {
+			if ( str_contains( $attrName, '{{' ) ) {
 				$this->errors['attribute-name-interpolation'][] = [ $tagName ];
 			}
 
 			if ( str_contains( $attrValue, '{{' ) ) {
-				if ( !self::isAttributeSafeForInterpolation( $attrNameLower ) ) {
+				if ( in_array( $attrNameLower, [ 'href', 'src' ], true ) && str_starts_with( $attrValue, '{{' ) ) {
+					foreach ( MustacheFilters::parseInterpolations( $attrValue ) as [$varName, $filters] ) {
+						if ( sizeof( $filters ) !== 1 || $filters[0] !== 'url' ) {
+							$this->errors['url-filter-required'][] = [ $attrNameLower, $tagName ];
+							break;
+						}
+					}
+				} else if ( !self::isAttributeSafeForInterpolation( $attrNameLower ) ) {
 					$this->errors['dangerous-attributes'][] = [ $attrName, $tagName ];
 				}
 			}

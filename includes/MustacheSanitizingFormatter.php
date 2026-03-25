@@ -19,13 +19,7 @@ class MustacheSanitizingFormatter extends RemexCompatFormatter {
 		foreach ( $node->attrs->getValues() as $attrName => $attrValue ) {
 			$attrNameLower = strtolower( $attrName );
 
-			if ( $attrNameLower === 'href' || $attrNameLower === 'src' ) {
-				$attrValue = trim( $attrValue );
-				$sanitizedValue = $this->sanitizeUrl( $attrValue );
-				if ( $sanitizedValue !== $attrValue ) {
-					$modifiedAttrs[$attrName] = $sanitizedValue;
-				}
-			} elseif ( $attrNameLower === 'style' ) {
+			if ( $attrNameLower === 'style' ) {
 				$sanitizedValue = Sanitizer::checkCss( $attrValue );
 				if ( $sanitizedValue !== $attrValue ) {
 					$modifiedAttrs[$attrName] = $sanitizedValue;
@@ -38,13 +32,5 @@ class MustacheSanitizingFormatter extends RemexCompatFormatter {
 		}
 
 		return parent::element( $parent, $node, $contents );
-	}
-
-	private function sanitizeUrl( string $url ): string {
-		$message = '';
-		if ( !preg_match( '!^(https?:|/)!i', $url ) ) {
-			return $message;
-		}
-		return $url;
 	}
 }

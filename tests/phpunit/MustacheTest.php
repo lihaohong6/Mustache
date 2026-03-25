@@ -244,7 +244,129 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 	}
 
 	/**
-	 * @covers MediaWiki\Extension\Mustache\MustacheRenderer::sanitizeRenderedTemplate
+	 * @covers MediaWiki\Extension\Mustache\MustacheFilters
+	 */
+	public function testCssIdFilter() {
+		$cases = [
+			'safe identifier'  => [ '{{ id|css-id }}', [ 'id' => 'my-class_1' ], 'my-class_1' ],
+			'strips spaces'    => [ '{{ id|css-id }}', [ 'id' => 'foo bar' ], 'foobar' ],
+			'strips html tags' => [ '{{ id|css-id }}', [ 'id' => '<script>' ], 'script' ],
+			'strips dots/colons' => [ '{{ id|css-id }}', [ 'id' => 'a.b:c' ], 'abc' ],
+		];
+		foreach ( $cases as $desc => [ $template, $data, $expected ] ) {
+			$result = MustacheRenderer::render( $template, $data );
+			$this->assertStringContainsString( $expected, $result, "css-id: $desc" );
+		}
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\Mustache\MustacheFilters
+	 */
+	public function testCssValueFilter() {
+		// Safe CSS value passes through
+		$result = MustacheRenderer::render(
+			'<div style="{{ val|css-value }}">x</div>',
+			[ 'val' => 'color: red' ]
+		);
+		$this->assertStringContainsString( 'color: red', $result );
+
+		// Dangerous CSS expression is sanitized
+		$result = MustacheRenderer::render(
+			'<div style="{{ val|css-value }}">x</div>',
+			[ 'val' => 'expression(alert(1))' ]
+		);
+		$this->assertStringNotContainsString( 'expression', $result );
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\Mustache\MustacheFilters
+	 */
+	public function testJsStringFilter() {
+		$cases = [
+			'plain string'    => [ '{{ s|js-string }}', [ 's' => 'hello world' ], 'hello world' ],
+			'escapes quotes'  => [ '{{ s|js-string }}', [ 's' => 'say "hi"' ], 'say \\u0022hi\\u0022' ],
+			'escapes html lt' => [ '{{ s|js-string }}', [ 's' => '<script>' ], '\\u003Cscript\\u003E' ],
+			'escapes amp'     => [ '{{ s|js-string }}', [ 's' => 'a&b' ], 'a\\u0026b' ],
+			'escapes newline' => [ '{{ s|js-string }}', [ 's' => "line1\nline2" ], 'line1\\nline2' ],
+		];
+		foreach ( $cases as $desc => [ $template, $data, $expected ] ) {
+			$result = MustacheRenderer::render( $template, $data );
+			$this->assertStringContainsString( $expected, $result, "js-string: $desc" );
+		}
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\Mustache\MustacheFilters
+	 */
+	public function testJsNumberFilter() {
+		$cases = [
+			'integer'     => [ '{{ n|js-number }}', [ 'n' => '42' ], '42' ],
+			'float'       => [ '{{ n|js-number }}', [ 'n' => '3.14' ], '3.14' ],
+			'negative'    => [ '{{ n|js-number }}', [ 'n' => '-7' ], '-7' ],
+			'non-numeric' => [ '{{ n|js-number }}', [ 'n' => 'abc' ], '0' ],
+			'empty'       => [ '{{ n|js-number }}', [ 'n' => '' ], '0' ],
+		];
+		foreach ( $cases as $desc => [ $template, $data, $expected ] ) {
+			$result = MustacheRenderer::render( $template, $data );
+			$this->assertStringContainsString( $expected, $result, "js-number: $desc" );
+		}
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\Mustache\MustacheFilters
+	 */
+	public function testJsIdentifierFilter() {
+		$cases = [
+			'valid identifier' => [ '{{ v|js-identifier }}', [ 'v' => 'myVar_1' ], 'myVar_1' ],
+			'strips spaces'    => [ '{{ v|js-identifier }}', [ 'v' => 'my var' ], 'myvar' ],
+			'strips html'      => [ '{{ v|js-identifier }}', [ 'v' => '<foo>' ], 'foo' ],
+			'keeps dollar'     => [ '{{ v|js-identifier }}', [ 'v' => '$var' ], '$var' ],
+		];
+		foreach ( $cases as $desc => [ $template, $data, $expected ] ) {
+			$result = MustacheRenderer::render( $template, $data );
+			$this->assertStringContainsString( $expected, $result, "js-identifier: $desc" );
+		}
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\Mustache\MustacheFilters
+	 */
+	public function testUrlFilter() {
+		// Safe URLs pass through
+		$result = MustacheRenderer::render( '{{ u|url }}', [ 'u' => 'https://example.com' ] );
+		$this->assertStringContainsString( 'https://example.com', $result );
+
+		$result = MustacheRenderer::render( '{{ u|url }}', [ 'u' => '/path/to/page' ] );
+		$this->assertStringContainsString( '/path/to/page', $result );
+
+		// Dangerous schemes are stripped to empty string
+		$result = MustacheRenderer::render( '{{ u|url }}', [ 'u' => 'javascript:alert(1)' ] );
+		$this->assertStringNotContainsString( 'javascript', $result );
+
+		$result = MustacheRenderer::render( '{{ u|url }}', [ 'u' => 'data:text/html,foo' ] );
+		$this->assertStringNotContainsString( 'data:', $result );
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\Mustache\MustacheFilters
+	 */
+	public function testPlainTextFilter() {
+		$cases = [
+			'strips bold tag'   => [ '{{ t|plain-text }}', [ 't' => '<b>bold</b>text' ], 'boldtext' ],
+			'plain string'      => [ '{{ t|plain-text }}', [ 't' => 'hello world' ], 'hello world' ],
+			'strips script tag' => [ '{{ t|plain-text }}', [ 't' => '<script>alert(1)</script>' ], 'alert(1)' ],
+		];
+		foreach ( $cases as $desc => [ $template, $data, $expected ] ) {
+			$result = MustacheRenderer::render( $template, $data );
+			$this->assertStringContainsString( $expected, $result, "plain-text: $desc" );
+		}
+		// Tags themselves are not present in the output
+		$result = MustacheRenderer::render( '{{ t|plain-text }}', [ 't' => '<b>bold</b>' ] );
+		$this->assertStringNotContainsString( '<b>', $result );
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\Mustache\MustacheFilters
 	 */
 	public function testUnicodeAndSpecialCharacters() {
 		$unicodeCases = [

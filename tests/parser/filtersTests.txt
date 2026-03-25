@@ -1,0 +1,273 @@
+!! options
+version=2
+!! end
+
+# ========================
+# css-id filter
+# ========================
+
+!! article
+Mustache:CssIdFilter
+!! text
+<div id="{{id|css-id}}">content</div>
+!! endarticle
+
+!! test
+css-id filter: preserves valid identifier characters
+!! wikitext
+{{#mustache:CssIdFilter|id=hello-world_1}}
+!! html
+<div id="hello-world_1">content</div>
+!! end
+
+!! test
+css-id filter: strips spaces
+!! wikitext
+{{#mustache:CssIdFilter|id=foo bar}}
+!! html
+<div id="foobar">content</div>
+!! end
+
+!! test
+css-id filter: preserves dots and hash
+!! wikitext
+{{#mustache:CssIdFilter|id=my.id#section}}
+!! html
+<div id="my.id#section">content</div>
+!! end
+
+!! article
+Mustache:CssIdInStyle
+!! text
+<style>
+#{{id|css-id}} {}
+</style>
+!! endarticle
+
+!! test
+css-id filter in style context: generates valid CSS selector
+!! wikitext
+{{#mustache:CssIdInStyle|id=hello-world}}
+!! html
+<style>
+#hello-world {}
+</style>
+!! end
+
+!! test
+css-id filter in style context: strips spaces from CSS selector
+!! wikitext
+{{#mustache:CssIdInStyle|id=user name}}
+!! html
+<style>
+#username {}
+</style>
+!! end
+
+# ========================
+# css-value filter
+# ========================
+
+!! article
+Mustache:CssValueFilter
+!! text
+<div style="color: {{color|css-value}}">text</div>
+!! endarticle
+
+!! test
+css-value filter: preserves safe CSS value
+!! wikitext
+{{#mustache:CssValueFilter|color=blue}}
+!! html
+<div style="color: blue">text</div>
+!! end
+
+!! test
+css-value filter: strips double quotes
+!! wikitext
+{{#mustache:CssValueFilter|color=red"}}
+!! html
+<div style="color: red">text</div>
+!! end
+
+!! test
+css-value filter: strips semicolons
+!! wikitext
+{{#mustache:CssValueFilter|color=red; background: green}}
+!! html
+<div style="color: red background: green">text</div>
+!! end
+
+!! article
+Mustache:CssValueInStyle
+!! text
+<style>
+body { color: {{color|css-value}}; }
+</style>
+!! endarticle
+
+!! test
+css-value filter in style context: allows safe CSS value
+!! wikitext
+{{#mustache:CssValueInStyle|color=blue}}
+!! html
+<style>
+body { color: blue; }
+</style>
+!! end
+
+!! test
+css-value filter in style context: strips dangerous characters
+!! wikitext
+{{#mustache:CssValueInStyle|color=red"}}
+!! html
+<style>
+body { color: red; }
+</style>
+!! end
+
+# ========================
+# js-identifier filter
+# ========================
+
+!! article
+Mustache:JsIdentifierFilter
+!! text
+<div class="{{name|js-identifier}}">text</div>
+!! endarticle
+
+!! test
+js-identifier filter: preserves valid identifier characters
+!! wikitext
+{{#mustache:JsIdentifierFilter|name=myVar_1$}}
+!! html
+<div class="myVar_1$">text</div>
+!! end
+
+!! test
+js-identifier filter: strips hyphens
+!! wikitext
+{{#mustache:JsIdentifierFilter|name=my-class}}
+!! html
+<div class="myclass">text</div>
+!! end
+
+!! article
+Mustache:JsIdentifierInScript
+!! text
+<script>var {{name|js-identifier}} = 1;</script>
+!! endarticle
+
+!! test
+js-identifier filter in script context: generates valid JS identifier
+!! wikitext
+{{#mustache:JsIdentifierInScript|name=myVar}}
+!! html
+<script>var myVar = 1;</script>
+!! end
+
+!! test
+js-identifier filter in script context: strips hyphens from identifier
+!! wikitext
+{{#mustache:JsIdentifierInScript|name=my-var}}
+!! html
+<script>var myvar = 1;</script>
+!! end
+
+# ========================
+# url filter
+# ========================
+
+!! article
+Mustache:UrlFilter
+!! text
+<a href="{{link|url}}">click</a>
+!! endarticle
+
+!! test
+url filter: passes through https URL
+!! wikitext
+{{#mustache:UrlFilter|link=https://example.com}}
+!! html
+<a href="https://example.com">click</a>
+!! end
+
+!! test
+url filter: passes through http URL
+!! wikitext
+{{#mustache:UrlFilter|link=http://example.com}}
+!! html
+<a href="http://example.com">click</a>
+!! end
+
+!! test
+url filter: blocks javascript scheme
+!! wikitext
+{{#mustache:UrlFilter|link=javascript:evil()}}
+!! html
+<a href="">click</a>
+!! end
+
+!! test
+url filter: normalizes protocol-relative URL to https
+!! wikitext
+{{#mustache:UrlFilter|link=//example.com/path}}
+!! html
+<a href="https://example.com/path">click</a>
+!! end
+
+!! test
+url filter: blocks invalid URL
+!! wikitext
+{{#mustache:UrlFilter|link=not a url}}
+!! html
+<a href="">click</a>
+!! end
+
+# ========================
+# js-string filter
+# ========================
+
+!! article
+Mustache:JsStringFilter
+!! text
+<p>"{{value|js-string}}"</p>
+!! endarticle
+
+!! test
+js-string filter: JSON-encodes plain string
+!! wikitext
+{{#mustache:JsStringFilter|value=hello world}}
+!! html
+<p>"hello world"</p>
+!! end
+
+!! test
+js-string filter: hex-encodes single quotes
+!! wikitext
+{{#mustache:JsStringFilter|value=say 'hi'}}
+!! html
+<p>"say \u0027hi\u0027"</p>
+!! end
+
+!! article
+Mustache:JsStringInScript
+!! text
+<script>var msg = "{{value|js-string}}";</script>
+!! endarticle
+
+!! test
+js-string filter in script context: encodes string value
+!! wikitext
+{{#mustache:JsStringInScript|value=hello world}}
+!! html
+<script>var msg = "hello world";</script>
+!! end
+
+!! test
+js-string filter in script context: hex-encodes script injection attempt
+!! wikitext
+{{#mustache:JsStringInScript|value=<script>}}
+!! html
+<script>var msg = "\u003Cscript\u003E";</script>
+!! end

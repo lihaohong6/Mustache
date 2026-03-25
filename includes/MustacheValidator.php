@@ -2,7 +2,6 @@
 
 namespace MediaWiki\Extension\Mustache;
 
-use RawMessage;
 use Wikimedia\RemexHtml\HTMLData;
 use Wikimedia\RemexHtml\Serializer\Serializer;
 use Wikimedia\RemexHtml\Tokenizer\Tokenizer;
@@ -19,7 +18,24 @@ class MustacheValidator {
 			$errors['raw-interpolation'][] = '';
 		}
 
-		$formatter = new MustacheValidationFormatter();
+		$allowedFilters = MustacheFilters::getBuiltinFilters();
+
+		foreach ( MustacheFilters::parseInterpolations( $template ) as [ $name, $filters ] ) {
+			if ( sizeof( $filters ) === 0 ) {
+				continue;
+			}
+			if ( sizeof( $filters ) > 1 ) {
+				$errors['unknown-filter'][] = implode( '|', $filters );
+				continue;
+			}
+			$filter = $filters[0];
+			if ( isset( $allowedFilters[ $filter ] ) ) {
+				continue;
+			}
+			$errors['unknown-filter'][] = $filter;
+		}
+
+		$formatter = new MustacheValidationFormatter( [], $allowedFilters );
 		$serializer = new Serializer( $formatter );
 		$treeBuilder = new TreeBuilder( $serializer, [
 			'ignoreErrors' => true,
@@ -46,9 +62,13 @@ class MustacheValidator {
 		$messages = [];
 
 		foreach ( $errors as $key => $value ) {
-			if ( $key === 'dangerous-attributes' || $key === 'attribute-name-interpolation' ) {
+			if (
+				$key === 'dangerous-attributes' ||
+				$key === 'attribute-name-interpolation' ||
+				$key === 'unknown-filter'
+			) {
 				foreach ( $value as $error ) {
-					$messages[] = wfMessage( 'mustache-error-dangerous-attribute', $error )
+					$messages[] = wfMessage( 'mustache-error-' . $key, $error )
 						->inContentLanguage()->text();
 				}
 			} else {
