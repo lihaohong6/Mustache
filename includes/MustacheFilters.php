@@ -8,11 +8,11 @@ class MustacheFilters {
 
 	public static function getBuiltinFilters(): array {
 		return [
-			'css-id' => static function ( $value ): string {
+			'css-selector' => static function ( $value ): string {
 				return preg_replace( '/[^a-zA-Z0-9_.#-]/', '', (string)$value );
 			},
 			'css-value' => static function ( $value ): string {
-				$value = preg_replace( '/[\'":;{}\\\\<>]/', '', (string)$value );
+				$value = preg_replace( '|[\'":;{}\\\\/<>]|', '', (string)$value );
 				return Sanitizer::checkCss( (string)$value );
 			},
 			'js-string' => static function ( $value ): string {
@@ -37,6 +37,10 @@ class MustacheFilters {
 					return '';
 				}
 				return $url;
+			},
+			'attribute' => static function ( $value ): string {
+				$escaped = htmlspecialchars( $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' );
+				return str_replace( '=', '&#x3D;', $escaped );
 			},
 		];
 	}

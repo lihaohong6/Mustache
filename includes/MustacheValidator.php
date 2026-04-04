@@ -65,7 +65,8 @@ class MustacheValidator {
 			if (
 				$key === 'dangerous-attributes' ||
 				$key === 'attribute-name-interpolation' ||
-				$key === 'unknown-filter'
+				$key === 'unknown-filter' ||
+				$key === 'attribute-filter-required'
 			) {
 				foreach ( $value as $error ) {
 					$messages[] = wfMessage( 'mustache-error-' . $key, $error )

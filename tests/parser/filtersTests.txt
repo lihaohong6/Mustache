@@ -3,51 +3,21 @@ version=2
 !! end
 
 # ========================
-# css-id filter
+# css-selector filter
 # ========================
 
 !! article
-Mustache:CssIdFilter
-!! text
-<div id="{{id|css-id}}">content</div>
-!! endarticle
-
-!! test
-css-id filter: preserves valid identifier characters
-!! wikitext
-{{#mustache:CssIdFilter|id=hello-world_1}}
-!! html
-<div id="hello-world_1">content</div>
-!! end
-
-!! test
-css-id filter: strips spaces
-!! wikitext
-{{#mustache:CssIdFilter|id=foo bar}}
-!! html
-<div id="foobar">content</div>
-!! end
-
-!! test
-css-id filter: preserves dots and hash
-!! wikitext
-{{#mustache:CssIdFilter|id=my.id#section}}
-!! html
-<div id="my.id#section">content</div>
-!! end
-
-!! article
-Mustache:CssIdInStyle
+Mustache:CssSelectorInStyle
 !! text
 <style>
-#{{id|css-id}} {}
+#{{id|css-selector}} {}
 </style>
 !! endarticle
 
 !! test
-css-id filter in style context: generates valid CSS selector
+css-selector filter in style context: generates valid CSS selector
 !! wikitext
-{{#mustache:CssIdInStyle|id=hello-world}}
+{{#mustache:CssSelectorInStyle|id=hello-world}}
 !! html
 <style>
 #hello-world {}
@@ -55,9 +25,9 @@ css-id filter in style context: generates valid CSS selector
 !! end
 
 !! test
-css-id filter in style context: strips spaces from CSS selector
+css-selector filter in style context: strips spaces from CSS selector
 !! wikitext
-{{#mustache:CssIdInStyle|id=user name}}
+{{#mustache:CssSelectorInStyle|id=user name}}
 !! html
 <style>
 #username {}
@@ -95,7 +65,7 @@ css-value filter: strips semicolons
 !! wikitext
 {{#mustache:CssValueFilter|color=red; background: green}}
 !! html
-<div style="color: red background: green">text</div>
+<div style="color: red background green">text</div>
 !! end
 
 !! article
@@ -129,28 +99,6 @@ body { color: red; }
 # ========================
 # js-identifier filter
 # ========================
-
-!! article
-Mustache:JsIdentifierFilter
-!! text
-<div class="{{name|js-identifier}}">text</div>
-!! endarticle
-
-!! test
-js-identifier filter: preserves valid identifier characters
-!! wikitext
-{{#mustache:JsIdentifierFilter|name=myVar_1$}}
-!! html
-<div class="myVar_1$">text</div>
-!! end
-
-!! test
-js-identifier filter: strips hyphens
-!! wikitext
-{{#mustache:JsIdentifierFilter|name=my-class}}
-!! html
-<div class="myclass">text</div>
-!! end
 
 !! article
 Mustache:JsIdentifierInScript
@@ -270,4 +218,38 @@ js-string filter in script context: hex-encodes script injection attempt
 {{#mustache:JsStringInScript|value=<script>}}
 !! html
 <script>var msg = "\u003Cscript\u003E";</script>
+!! end
+
+# ========================
+# attribute filter
+# ========================
+
+!! article
+Mustache:AttributeFilter
+!! text
+<div class="{{name|attribute}}">text</div>
+!! endarticle
+
+!! test
+attribute filter: preserves safe value
+!! wikitext
+{{#mustache:AttributeFilter|name=my-class}}
+!! html
+<div class="my-class">text</div>
+!! end
+
+!! test
+attribute filter: escapes double quotes
+!! wikitext
+{{#mustache:AttributeFilter|name=say "hi"}}
+!! html
+<div class="say &quot;hi&quot;">text</div>
+!! end
+
+!! test
+attribute filter: escapes ampersand
+!! wikitext
+{{#mustache:AttributeFilter|name=a&b}}
+!! html
+<div class="a&amp;b">text</div>
 !! end

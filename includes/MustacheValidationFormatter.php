@@ -65,6 +65,20 @@ class MustacheValidationFormatter extends RemexCompatFormatter {
 					}
 				} else if ( !self::isAttributeSafeForInterpolation( $attrNameLower ) ) {
 					$this->errors['dangerous-attributes'][] = [ $attrName, $tagName ];
+				} else if ( $attrNameLower === 'style' ) {
+					foreach ( MustacheFilters::parseInterpolations( $attrValue ) as [$varName, $filters] ) {
+						if ( !in_array( 'css-value', $filters, true ) ) {
+							$this->errors['attribute-filter-required'][] = [ $attrNameLower, $tagName, 'css-value' ];
+							break;
+						}
+					}
+				} else {
+					foreach ( MustacheFilters::parseInterpolations( $attrValue ) as [$varName, $filters] ) {
+						if ( !in_array( 'attribute', $filters, true ) ) {
+							$this->errors['attribute-filter-required'][] = [ $attrNameLower, $tagName, 'attribute' ];
+							break;
+						}
+					}
 				}
 			}
 		}

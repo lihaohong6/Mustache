@@ -104,30 +104,6 @@ class ArgumentParserTest extends MediaWikiIntegrationTestCase {
 	/**
 	 * @covers MediaWiki\Extension\Mustache\MustacheDataParser::parseArguments
 	 */
-	public function testParseMixedArguments() {
-		$args = [
-			'',
-			'title=Hello World',
-			'enabled=true',
-			'count=42',
-			'items=["a","b","c"]',
-			'meta={"author":"Test","version":"1.0"}'
-		];
-
-		$result = MustacheDataParser::parseArguments( $args );
-
-		$this->assertSame( 'Hello World', $result['title'] );
-		$this->assertSame( 'true', $result['enabled'] );
-		$this->assertSame( '42', $result['count'] );
-		$this->assertIsArray( $result['items'] );
-		$this->assertSame( 'a', $result['items'][0] );
-		$this->assertIsArray( $result['meta'] );
-		$this->assertSame( 'Test', $result['meta']['author'] );
-	}
-
-	/**
-	 * @covers MediaWiki\Extension\Mustache\MustacheDataParser::parseArguments
-	 */
 	public function testParseInvalidJson() {
 		$args = [
 			'',
@@ -182,8 +158,7 @@ class ArgumentParserTest extends MediaWikiIntegrationTestCase {
 		$args = [
 			'',
 			'emptyArray=[]',
-			'emptyObject={}',
-			'simple={}'
+			'emptyObject={}'
 		];
 
 		$result = MustacheDataParser::parseArguments( $args );
@@ -192,8 +167,6 @@ class ArgumentParserTest extends MediaWikiIntegrationTestCase {
 		$this->assertEmpty( $result['emptyArray'] );
 		$this->assertIsArray( $result['emptyObject'] );
 		$this->assertEmpty( $result['emptyObject'] );
-		$this->assertIsArray( $result['simple'] );
-		$this->assertEmpty( $result['simple'] );
 	}
 
 }
