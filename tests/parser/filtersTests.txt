@@ -179,7 +179,7 @@ url filter: blocks invalid URL
 !! article
 Mustache:JsStringFilter
 !! text
-<p>"{{value|js-string}}"</p>
+<p>{{value|js-string}}</p>
 !! endarticle
 
 !! test
@@ -187,7 +187,7 @@ js-string filter: JSON-encodes plain string
 !! wikitext
 {{#mustache:JsStringFilter|value=hello world}}
 !! html
-<p>"hello world"</p>
+<p>'hello world'</p>
 !! end
 
 !! test
@@ -195,13 +195,13 @@ js-string filter: hex-encodes single quotes
 !! wikitext
 {{#mustache:JsStringFilter|value=say 'hi'}}
 !! html
-<p>"say \u0027hi\u0027"</p>
+<p>'say \u0027hi\u0027'</p>
 !! end
 
 !! article
 Mustache:JsStringInScript
 !! text
-<script>var msg = "{{value|js-string}}";</script>
+<script>var msg = {{value|js-string}};</script>
 !! endarticle
 
 !! test
@@ -209,7 +209,7 @@ js-string filter in script context: encodes string value
 !! wikitext
 {{#mustache:JsStringInScript|value=hello world}}
 !! html
-<script>var msg = "hello world";</script>
+<script>var msg = 'hello world';</script>
 !! end
 
 !! test
@@ -217,7 +217,7 @@ js-string filter in script context: hex-encodes script injection attempt
 !! wikitext
 {{#mustache:JsStringInScript|value=<script>}}
 !! html
-<script>var msg = "\u003Cscript\u003E";</script>
+<script>var msg = '\u003Cscript\u003E';</script>
 !! end
 
 # ========================

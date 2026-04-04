@@ -17,7 +17,7 @@ class MustacheFilters {
 			},
 			'js-string' => static function ( $value ): string {
 				$json = json_encode( $value, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE );
-				return substr( $json, 1, -1 );
+				return "'" . substr( $json, 1, -1 ) . "'";
 			},
 			'js-identifier' => static function ( $value ): string {
 				return preg_replace( '/[^a-zA-Z0-9_$]/', '', (string)$value );

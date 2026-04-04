@@ -163,11 +163,11 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 	 */
 	public function testJsStringFilter() {
 		$cases = [
-			'plain string'    => [ '{{ s|js-string }}', [ 's' => 'hello world' ], 'hello world' ],
-			'escapes quotes'  => [ '{{ s|js-string }}', [ 's' => 'say "hi"' ], 'say \\u0022hi\\u0022' ],
-			'escapes html lt' => [ '{{ s|js-string }}', [ 's' => '<script>' ], '\\u003Cscript\\u003E' ],
-			'escapes amp'     => [ '{{ s|js-string }}', [ 's' => 'a&b' ], 'a\\u0026b' ],
-			'escapes newline' => [ '{{ s|js-string }}', [ 's' => "line1\nline2" ], 'line1\\nline2' ],
+			'plain string'    => [ '{{ s|js-string }}', [ 's' => 'hello world' ], "'hello world'" ],
+			'escapes quotes'  => [ '{{ s|js-string }}', [ 's' => 'say "hi"' ], "'say \\u0022hi\\u0022'" ],
+			'escapes html lt' => [ '{{ s|js-string }}', [ 's' => '<script>' ], "'\\u003Cscript\\u003E'" ],
+			'escapes amp'     => [ '{{ s|js-string }}', [ 's' => 'a&b' ], "'a\\u0026b'" ],
+			'escapes newline' => [ '{{ s|js-string }}', [ 's' => "line1\nline2" ], "'line1\\nline2'" ],
 		];
 		foreach ( $cases as $desc => [ $template, $data, $expected ] ) {
 			$result = MustacheRenderer::render( $template, $data );
