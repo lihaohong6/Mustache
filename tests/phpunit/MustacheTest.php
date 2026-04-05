@@ -220,6 +220,25 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 
 	/**
 	 * @covers MediaWiki\Extension\Mustache\MustacheFilters
+	 * @covers MediaWiki\Extension\Mustache\MustacheRenderer
+	 */
+	public function testFilterOutputNotDoubleEscaped() {
+		// attribute filter produces &quot; — must not be re-encoded to &amp;quot;
+		$result = MustacheRenderer::render(
+			'<div class="{{ cls|attribute }}">text</div>',
+			[ 'cls' => 'a"b' ]
+		);
+		$this->assertStringContainsString( '&quot;', $result );
+		$this->assertStringNotContainsString( '&amp;quot;', $result );
+
+		// js-string filter wraps in single quotes — must not become &#039;
+		$result = MustacheRenderer::render( '{{ s|js-string }}', [ 's' => 'hello' ] );
+		$this->assertStringContainsString( "'hello'", $result );
+		$this->assertStringNotContainsString( '&#039;', $result );
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\Mustache\MustacheFilters
 	 */
 	public function testUnicodeAndSpecialCharacters() {
 		$unicodeCases = [

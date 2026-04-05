@@ -26,7 +26,10 @@ class MustacheRenderer {
 			'pragmas' => [ Engine::PRAGMA_FILTERS ],
 			'helpers' => MustacheFilters::getBuiltinFilters(),
 			'escape' => function ( $value ) {
-				return htmlspecialchars($value, ENT_SUBSTITUTE, 'UTF-8', false);
+				if ( $value instanceof FilteredString ) {
+					return (string)$value;
+				}
+				return htmlspecialchars( $value, ENT_SUBSTITUTE, 'UTF-8', false );
 			},
 		] );
 		$rendered = $engine->render( $template, $data );
