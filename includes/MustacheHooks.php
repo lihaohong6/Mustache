@@ -2,12 +2,8 @@
 
 namespace MediaWiki\Extension\Mustache;
 
-use MediaWiki\Content\ValidationParams;
-use MediaWiki\MediaWikiServices;
-use MediaWiki\Page\PageIdentityValue;
 use MediaWiki\Parser\Parser;
 use MediaWiki\Parser\PPFrame;
-use MediaWiki\Revision\SlotRecord;
 
 class MustacheHooks {
 
@@ -68,7 +64,7 @@ class MustacheHooks {
 
 		$html = MustacheRenderer::render( $template, $data );
 
-		return MustacheRenderer::storeHtmlWithMarker( $parser, $html );
+		return MustacheRenderer::storeForOutput( $parser, $html );
 	}
 
 	public static function renderHtml( Parser $parser, PPFrame $frame, array $args ): string|array {
@@ -85,7 +81,7 @@ class MustacheHooks {
 
 		$html = $result['content'];
 
-		return MustacheRenderer::storeHtmlWithMarker( $parser, $html );
+		return MustacheRenderer::storeForOutput( $parser, $html );
 	}
 
 	public static function addLuaLibrary( $engine, &$extraLibraries ) {

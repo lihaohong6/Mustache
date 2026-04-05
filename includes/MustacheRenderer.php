@@ -54,9 +54,15 @@ class MustacheRenderer {
 		return $serializer->getResult();
 	}
 
-	public static function storeHtmlWithMarker( Parser $parser, string $html ): string {
-		$marker = self::$markerPrefix . wfRandomString( 16 ) . self::$markerSuffix;
-		$parser->getOutput()->appendExtensionData( 'mustacheRenderings', $marker . '|' . $html );
-		return $marker;
+	public static function storeForOutput( Parser $parser, string $html ): string {
+		// Parsoid needs a special tag.
+		if ( $parser->getOptions()->getUseParsoid() ) {
+			$id = MustacheStorage::store( $html );
+			return '<mustache-rendered id="' . $id . '" />';
+		} else {
+			$marker = self::$markerPrefix . wfRandomString( 16 ) . self::$markerSuffix;
+			$parser->getOutput()->appendExtensionData( 'mustacheRenderings', $marker . '|' . $html );
+			return $marker;
+		}
 	}
 }

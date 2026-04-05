@@ -35,7 +35,7 @@ class MustacheLuaLibrary extends LibraryBase {
 
 		$html = MustacheRenderer::render( $template, $phpData );
 
-		$marker = MustacheRenderer::storeHtmlWithMarker( $this->getParser(), $html );
+		$marker = MustacheRenderer::storeForOutput( $this->getParser(), $html );
 
 		return [ $marker ];
 	}
