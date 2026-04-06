@@ -9,10 +9,6 @@ use Wikimedia\RemexHtml\Tokenizer\PlainAttributes;
 
 class MustacheSanitizingFormatter extends RemexCompatFormatter {
 
-	public function __construct( array $options = [] ) {
-		parent::__construct( $options );
-	}
-
 	public function element( SerializerNode $parent, SerializerNode $node, $contents ) {
 		$modifiedAttrs = [];
 
@@ -27,7 +23,7 @@ class MustacheSanitizingFormatter extends RemexCompatFormatter {
 			}
 		}
 
-		if ( sizeof( $modifiedAttrs ) > 0 ) {
+		if ( count( $modifiedAttrs ) > 0 ) {
 			$node->attrs = new PlainAttributes( array_merge($node->attrs->getValues(), $modifiedAttrs ) );
 		}
 

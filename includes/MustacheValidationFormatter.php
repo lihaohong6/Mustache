@@ -12,9 +12,8 @@ class MustacheValidationFormatter extends RemexCompatFormatter {
 
 	private array $errors = [];
 
-	public function __construct( array $options = [], array $filters = [] ) {
+	public function __construct( array $options = [] ) {
 		parent::__construct( $options );
-		$this->errors = [];
 		$filters = MustacheFilters::getBuiltinFilters();
 		$allowedFilters = array_keys( $filters );
 		$this->restrictedTags = [
@@ -23,7 +22,7 @@ class MustacheValidationFormatter extends RemexCompatFormatter {
 			} ),
 			'script' => array_filter( $allowedFilters, static function ( $filter ) {
 				return str_starts_with( $filter, 'js' );
-			})
+			} )
 		];
 	}
 
@@ -56,27 +55,36 @@ class MustacheValidationFormatter extends RemexCompatFormatter {
 			}
 
 			if ( str_contains( $attrValue, '{{' ) ) {
-				if ( in_array( $attrNameLower, [ 'href', 'src' ], true ) && str_starts_with( $attrValue, '{{' ) ) {
+				if (
+					in_array(
+						$attrNameLower,
+						[
+							'href',
+							'src'
+						]
+					) && str_starts_with( $attrValue, '{{' )
+				) {
+					// Start of href and src are prone to XSS through protocols such as javascript:
 					foreach ( MustacheFilters::parseInterpolations( $attrValue ) as [$varName, $filters] ) {
-						if ( sizeof( $filters ) !== 1 || $filters[0] !== 'url' ) {
-							$this->errors['url-filter-required'][] = [ $attrNameLower, $tagName ];
-							break;
-						}
-					}
-				} else if ( !self::isAttributeSafeForInterpolation( $attrNameLower ) ) {
-					$this->errors['dangerous-attributes'][] = [ $attrName, $tagName ];
-				} else if ( $attrNameLower === 'style' ) {
-					foreach ( MustacheFilters::parseInterpolations( $attrValue ) as [$varName, $filters] ) {
-						if ( !in_array( 'css-value', $filters, true ) ) {
-							$this->errors['attribute-filter-required'][] = [ $attrNameLower, $tagName, 'css-value' ];
+						if ( count( $filters ) !== 1 || $filters[0] !== 'url' ) {
+							$this->errors['url-filter-required'][] = [
+								$attrNameLower,
+								$tagName
+							];
 							break;
 						}
 					}
 				} else {
-					foreach ( MustacheFilters::parseInterpolations( $attrValue ) as [$varName, $filters] ) {
-						if ( !in_array( 'attribute', $filters, true ) ) {
-							$this->errors['attribute-filter-required'][] = [ $attrNameLower, $tagName, 'attribute' ];
-							break;
+					if ( !self::isAttributeSafeForInterpolation( $attrNameLower ) ) {
+						$this->errors['dangerous-attributes'][] = [
+							$attrName,
+							$tagName
+						];
+					} else {
+						if ( $attrNameLower === 'style' ) {
+							$this->checkAttributeFilter( $tagName, $attrNameLower, $attrValue, 'css-value' );
+						} else {
+							$this->checkAttributeFilter( $tagName, $attrNameLower, $attrValue, 'attribute' );
 						}
 					}
 				}
@@ -93,6 +101,24 @@ class MustacheValidationFormatter extends RemexCompatFormatter {
 	 */
 	public function getErrors(): array {
 		return $this->errors;
+	}
+
+	private function checkAttributeFilter(
+		string $tagName,
+		string $attrName,
+		string $attrValue,
+		string $requiredFilter
+	): void {
+		foreach ( MustacheFilters::parseInterpolations( $attrValue ) as [$varName, $filters] ) {
+			if ( !in_array( $requiredFilter, $filters ) ) {
+				$this->errors['attribute-filter-required'][] = [
+					$attrName,
+					$tagName,
+					$requiredFilter
+				];
+				break;
+			}
+		}
 	}
 
 	private static function isAttributeSafeForInterpolation( string $attrName ): bool {

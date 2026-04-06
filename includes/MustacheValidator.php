@@ -21,10 +21,10 @@ class MustacheValidator {
 		$allowedFilters = MustacheFilters::getBuiltinFilters();
 
 		foreach ( MustacheFilters::parseInterpolations( $template ) as [ $name, $filters ] ) {
-			if ( sizeof( $filters ) === 0 ) {
+			if ( count( $filters ) === 0 ) {
 				continue;
 			}
-			if ( sizeof( $filters ) > 1 ) {
+			if ( count( $filters ) > 1 ) {
 				$errors['unknown-filter'][] = implode( '|', $filters );
 				continue;
 			}
@@ -35,7 +35,7 @@ class MustacheValidator {
 			$errors['unknown-filter'][] = $filter;
 		}
 
-		$formatter = new MustacheValidationFormatter( [], $allowedFilters );
+		$formatter = new MustacheValidationFormatter();
 		$serializer = new Serializer( $formatter );
 		$treeBuilder = new TreeBuilder( $serializer, [
 			'ignoreErrors' => true,

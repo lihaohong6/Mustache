@@ -40,6 +40,7 @@ class MustacheFilters {
 			},
 			'attribute' => static function ( $value ): FilteredString {
 				$escaped = htmlspecialchars( $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' );
+				// In case of <div id={{value}}> where value is `something onclick=alert(1)`
 				return new FilteredString( str_replace( '=', '&#x3D;', $escaped ) );
 			},
 		];

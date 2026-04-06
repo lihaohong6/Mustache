@@ -55,8 +55,8 @@ class MustacheLuaLibrary extends LibraryBase {
 			$converted = [];
 			foreach ( $table as $key => $value ) {
 				if ( is_int( $key ) || is_string( $key ) ) {
-					$new_key = is_int( $key ) ? $key - 1 : $key;
-					$converted[$new_key] = self::convertLuaTableToArray( $value );
+					$newKey = is_int( $key ) ? $key - 1 : $key;
+					$converted[$newKey] = self::convertLuaTableToArray( $value );
 				}
 			}
 			return $converted;

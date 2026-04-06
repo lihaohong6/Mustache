@@ -46,7 +46,8 @@ class MustacheHooks {
 		$template = $result['content'];
 
 		$data = [];
-		for ( $i = 1; $i < count( $args ); $i++ ) {
+		$argCount = count( $args );
+		for ( $i = 1; $i < $argCount; $i++ ) {
 			$expandedArg = $frame->expand( $args[$i] );
 
 			if ( preg_match( '/^([^=]+)=(.*)$/s', $expandedArg, $matches ) ) {
@@ -54,7 +55,7 @@ class MustacheHooks {
 				$value = trim( $matches[2] );
 				$value = $parser->recursivePreprocess( $value );
 				$parsed = MustacheDataParser::parseValue( $value );
-				if ( sizeof( $parsed ) === 1 ) {
+				if ( count( $parsed ) === 1 ) {
 					$data[ $key ] = $parsed[0];
 				} else {
 					return $parsed[1];
@@ -95,12 +96,14 @@ class MustacheHooks {
 		if ( !is_array( $replacements ) ) {
 			return;
 		}
+		$map = [];
 		foreach ( $replacements as $replacement => $boolValue ) {
 			[
 				$marker,
 				$html
 			] = explode( '|', $replacement, 2 );
-			$text = str_replace( $marker, $html, $text );
+			$map[$marker] = $html;
 		}
+		$text = strtr( $text, $map );
 	}
 }
