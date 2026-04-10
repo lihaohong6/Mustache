@@ -12,10 +12,10 @@ use Wikimedia\RemexHtml\TreeBuilder\TreeBuilder;
 
 class MustacheRenderer {
 
-	public static string $markerSuffix = "_END</div>";
-	public static string $markerPrefix = "<div>\xEF\xBF\xBCMUSTACHE_";
+	private const MARKER_SUFFIX = "_END</div>";
+	private const MARKER_PREFIX = "<div>\xEF\xBF\xBCMUSTACHE_";
 
-	public static function render( string $template, array $data ): string {
+	public function render( string $template, array $data ): string {
 		$engine = new Engine( [
 			'entity_flags' => ENT_QUOTES,
 			// Lambdas required by PRAGMA_FILTERS
@@ -33,10 +33,10 @@ class MustacheRenderer {
 			},
 		] );
 		$rendered = $engine->render( $template, $data );
-		return self::sanitizeRenderedTemplate( $rendered );
+		return $this->sanitizeRenderedTemplate( $rendered );
 	}
 
-	public static function sanitizeRenderedTemplate( string $rendered ): string {
+	public function sanitizeRenderedTemplate( string $rendered ): string {
 		$formatter = new MustacheSanitizingFormatter();
 		$serializer = new Serializer( $formatter );
 		$treeBuilder = new TreeBuilder( $serializer, [
@@ -57,13 +57,13 @@ class MustacheRenderer {
 		return $serializer->getResult();
 	}
 
-	public static function storeForOutput( Parser $parser, string $html ): string {
+	public function storeForOutput( Parser $parser, string $html ): string {
 		// Parsoid needs a special tag.
 		if ( $parser->getOptions()->getUseParsoid() ) {
 			$id = MustacheStorage::store( $html );
 			return '<mustache-rendered id="' . $id . '" />';
 		} else {
-			$marker = self::$markerPrefix . wfRandomString( 16 ) . self::$markerSuffix;
+			$marker = self::MARKER_PREFIX . wfRandomString( 16 ) . self::MARKER_SUFFIX;
 			$parser->getOutput()->appendExtensionData( 'mustacheRenderings', $marker . '|' . $html );
 			return $marker;
 		}

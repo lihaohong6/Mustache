@@ -7,16 +7,19 @@ use MediaWiki\Parser\PPFrame;
 
 class MustacheHooks {
 
+	public function __construct( private readonly MustacheRenderer $renderer ) {
+	}
+
 	public static function onRegistration(): void {
 		define( 'CONTENT_MODEL_HTML', 'html' );
 		define( 'CONTENT_MODEL_MUSTACHE', 'mustache' );
 	}
 
-	public static function onParserFirstCallInit( Parser $parser ): void {
+	public function onParserFirstCallInit( Parser $parser ): void {
 		$parser->setFunctionHook(
 			'mustache',
 			[
-				self::class,
+				$this,
 				'renderMustache'
 			],
 			Parser::SFH_OBJECT_ARGS
@@ -24,14 +27,14 @@ class MustacheHooks {
 		$parser->setFunctionHook(
 			'html',
 			[
-				self::class,
+				$this,
 				'renderHtml'
 			],
 			Parser::SFH_OBJECT_ARGS
 		);
 	}
 
-	public static function renderMustache( Parser $parser, PPFrame $frame, array $args ): string|array {
+	public function renderMustache( Parser $parser, PPFrame $frame, array $args ): string|array {
 		$templateName = MustacheUtils::extractTemplateName( $args, $frame );
 		$result = MustacheUtils::loadTemplateContent( $templateName, NS_MUSTACHE, $parser );
 
@@ -63,12 +66,12 @@ class MustacheHooks {
 			}
 		}
 
-		$html = MustacheRenderer::render( $template, $data );
+		$html = $this->renderer->render( $template, $data );
 
-		return MustacheRenderer::storeForOutput( $parser, $html );
+		return $this->renderer->storeForOutput( $parser, $html );
 	}
 
-	public static function renderHtml( Parser $parser, PPFrame $frame, array $args ): string|array {
+	public function renderHtml( Parser $parser, PPFrame $frame, array $args ): string|array {
 		$pageName = MustacheUtils::extractTemplateName( $args, $frame );
 		$result = MustacheUtils::loadTemplateContent( $pageName, NS_HTML, $parser );
 
@@ -82,16 +85,16 @@ class MustacheHooks {
 
 		$html = $result['content'];
 
-		return MustacheRenderer::storeForOutput( $parser, $html );
+		return $this->renderer->storeForOutput( $parser, $html );
 	}
 
-	public static function addLuaLibrary( string $engine, array &$extraLibraries ): void {
+	public function onScribuntoExternalLibraries( string $engine, array &$extraLibraries ): void {
 		if ( $engine === 'lua' ) {
 			$extraLibraries['mw.ext.mustache'] = MustacheLuaLibrary::class;
 		}
 	}
 
-	public static function onParserAfterTidy( Parser $parser, string &$text ): void {
+	public function onParserAfterTidy( Parser $parser, string &$text ): void {
 		$replacements = $parser->getOutput()->getExtensionData( 'mustacheRenderings' );
 		if ( !is_array( $replacements ) ) {
 			return;

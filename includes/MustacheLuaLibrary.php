@@ -4,6 +4,7 @@ namespace MediaWiki\Extension\Mustache;
 
 use MediaWiki\Extension\Scribunto\Engines\LuaCommon\LibraryBase;
 use MediaWiki\Extension\Scribunto\Engines\LuaCommon\LuaError;
+use MediaWiki\MediaWikiServices;
 
 class MustacheLuaLibrary extends LibraryBase {
 
@@ -33,9 +34,10 @@ class MustacheLuaLibrary extends LibraryBase {
 
 		$phpData = self::convertLuaTableToArray( $data );
 
-		$html = MustacheRenderer::render( $template, $phpData );
+		$renderer = MustacheServices::wrap( MediaWikiServices::getInstance() )->getRenderer();
+		$html = $renderer->render( $template, $phpData );
 
-		$marker = MustacheRenderer::storeForOutput( $this->getParser(), $html );
+		$marker = $renderer->storeForOutput( $this->getParser(), $html );
 
 		return [ $marker ];
 	}

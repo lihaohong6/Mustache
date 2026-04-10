@@ -7,9 +7,12 @@ use MediaWikiIntegrationTestCase;
 
 class MustacheTest extends MediaWikiIntegrationTestCase {
 
+	private MustacheRenderer $renderer;
+
 	protected function setUp(): void {
 		parent::setUp();
 		$this->setMwGlobals( 'wgLanguageCode', 'en' );
+		$this->renderer = $this->getServiceContainer()->get( 'Mustache.Renderer' );
 	}
 
 	/**
@@ -27,7 +30,7 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $safeUrls as $input => $expected ) {
-			$result = MustacheRenderer::sanitizeRenderedTemplate( $input );
+			$result = $this->renderer->sanitizeRenderedTemplate( $input );
 			$this->assertSame( $expected, $result, "Safe URL should be preserved: $input" );
 		}
 	}
@@ -41,7 +44,7 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $safeStyles as $input => $expected ) {
-			$result = MustacheRenderer::sanitizeRenderedTemplate( $input );
+			$result = $this->renderer->sanitizeRenderedTemplate( $input );
 			$this->assertSame( $expected, $result, "Safe style should be preserved: $input" );
 		}
 	}
@@ -59,7 +62,7 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $dangerousStyles as $input => $expected ) {
-			$result = MustacheRenderer::sanitizeRenderedTemplate( $input );
+			$result = $this->renderer->sanitizeRenderedTemplate( $input );
 			$this->assertSame( $expected, $result, "Dangerous style should be removed: $input" );
 		}
 	}
@@ -75,7 +78,7 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $cases as $input => $expected ) {
-			$result = MustacheRenderer::sanitizeRenderedTemplate( $input );
+			$result = $this->renderer->sanitizeRenderedTemplate( $input );
 			$this->assertSame( $expected, $result, "Attribute case should be handled correctly: $input" );
 		}
 	}
@@ -91,7 +94,7 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $specialCases as $input => $expected ) {
-			$result = MustacheRenderer::sanitizeRenderedTemplate( $input );
+			$result = $this->renderer->sanitizeRenderedTemplate( $input );
 			$this->assertSame( $expected, $result, "URL with special characters should be handled: $input" );
 		}
 	}
@@ -105,7 +108,7 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 			'</div>';
 		$expected = $input;
 
-		$result = MustacheRenderer::sanitizeRenderedTemplate( $input );
+		$result = $this->renderer->sanitizeRenderedTemplate( $input );
 		$this->assertSame( $expected, $result, "Non-url attributes should be unaffected" );
 	}
 
@@ -119,7 +122,7 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $whitespaceCases as $input => $expected ) {
-			$result = MustacheRenderer::sanitizeRenderedTemplate( $input );
+			$result = $this->renderer->sanitizeRenderedTemplate( $input );
 			$this->assertSame( $expected, $result, "Whitespace in attributes should be handled: $input" );
 		}
 	}
@@ -134,7 +137,7 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 			'strips html tags' => [ '{{ id|css-selector }}', [ 'id' => '<script>' ], 'script' ],
 		];
 		foreach ( $cases as $desc => [ $template, $data, $expected ] ) {
-			$result = MustacheRenderer::render( $template, $data );
+			$result = $this->renderer->render( $template, $data );
 			$this->assertStringContainsString( $expected, $result, "css-selector: $desc" );
 		}
 	}
@@ -144,14 +147,14 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 	 */
 	public function testCssValueFilter() {
 		// Safe CSS value passes through
-		$result = MustacheRenderer::render(
+		$result = $this->renderer->render(
 			'<div style="color: {{ val|css-value }}">x</div>',
 			[ 'val' => 'red' ]
 		);
 		$this->assertStringContainsString( 'color: red', $result );
 
 		// Dangerous CSS expression is sanitized
-		$result = MustacheRenderer::render(
+		$result = $this->renderer->render(
 			'<div style="{{ val|css-value }}">x</div>',
 			[ 'val' => 'expression(alert(1))' ]
 		);
@@ -170,7 +173,7 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 			'escapes newline' => [ '{{ s|js-string }}', [ 's' => "line1\nline2" ], "'line1\\nline2'" ],
 		];
 		foreach ( $cases as $desc => [ $template, $data, $expected ] ) {
-			$result = MustacheRenderer::render( $template, $data );
+			$result = $this->renderer->render( $template, $data );
 			$this->assertStringContainsString( $expected, $result, "js-string: $desc" );
 		}
 	}
@@ -186,7 +189,7 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 			'keeps dollar'     => [ '{{ v|js-identifier }}', [ 'v' => '$var' ], '$var' ],
 		];
 		foreach ( $cases as $desc => [ $template, $data, $expected ] ) {
-			$result = MustacheRenderer::render( $template, $data );
+			$result = $this->renderer->render( $template, $data );
 			$this->assertStringContainsString( $expected, $result, "js-identifier: $desc" );
 		}
 	}
@@ -196,14 +199,14 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 	 */
 	public function testUrlFilter() {
 		// Safe URLs pass through
-		$result = MustacheRenderer::render( '{{ u|url }}', [ 'u' => 'https://example.com' ] );
+		$result = $this->renderer->render( '{{ u|url }}', [ 'u' => 'https://example.com' ] );
 		$this->assertStringContainsString( 'https://example.com', $result );
 
 		// Dangerous schemes are stripped to empty string
-		$result = MustacheRenderer::render( '{{ u|url }}', [ 'u' => 'javascript:alert(1)' ] );
+		$result = $this->renderer->render( '{{ u|url }}', [ 'u' => 'javascript:alert(1)' ] );
 		$this->assertStringNotContainsString( 'javascript', $result );
 
-		$result = MustacheRenderer::render( '{{ u|url }}', [ 'u' => 'data:text/html,foo' ] );
+		$result = $this->renderer->render( '{{ u|url }}', [ 'u' => 'data:text/html,foo' ] );
 		$this->assertStringNotContainsString( 'data:', $result );
 	}
 
@@ -211,7 +214,7 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 	 * @covers MediaWiki\Extension\Mustache\MustacheFilters
 	 */
 	public function testAttributeFilter() {
-		$result = MustacheRenderer::render(
+		$result = $this->renderer->render(
 			'<div class="{{ cls|attribute }}">text</div>',
 			[ 'cls' => 'my-class "test"' ]
 		);
@@ -224,7 +227,7 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 	 */
 	public function testFilterOutputNotDoubleEscaped() {
 		// attribute filter produces &quot; — must not be re-encoded to &amp;quot;
-		$result = MustacheRenderer::render(
+		$result = $this->renderer->render(
 			'<div class="{{ cls|attribute }}">text</div>',
 			[ 'cls' => 'a"b' ]
 		);
@@ -232,7 +235,7 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 		$this->assertStringNotContainsString( '&amp;quot;', $result );
 
 		// js-string filter wraps in single quotes — must not become &#039;
-		$result = MustacheRenderer::render( '{{ s|js-string }}', [ 's' => 'hello' ] );
+		$result = $this->renderer->render( '{{ s|js-string }}', [ 's' => 'hello' ] );
 		$this->assertStringContainsString( "'hello'", $result );
 		$this->assertStringNotContainsString( '&#039;', $result );
 	}
@@ -247,7 +250,7 @@ class MustacheTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $unicodeCases as $input => $expected ) {
-			$result = MustacheRenderer::sanitizeRenderedTemplate( $input );
+			$result = $this->renderer->sanitizeRenderedTemplate( $input );
 			$this->assertSame( $expected, $result, "Unicode and special characters should be handled: $input" );
 		}
 	}

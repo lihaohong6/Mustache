@@ -54,11 +54,20 @@
 	"TestAutoloadNamespaces": {
 		"MediaWiki\\Extension\\Mustache\\Tests\\": "tests/phpunit/"
 	},
+	"ServiceWiringFiles": [
+		"includes/ServiceWiring.php"
+	],
 	"callback": "MediaWiki\\Extension\\Mustache\\MustacheHooks::onRegistration",
+	"HookHandlers": {
+		"main": {
+			"class": "MediaWiki\\Extension\\Mustache\\MustacheHooks",
+			"services": ["Mustache.Renderer"]
+		}
+	},
 	"Hooks": {
-		"ParserFirstCallInit": "MediaWiki\\Extension\\Mustache\\MustacheHooks::onParserFirstCallInit",
-		"ScribuntoExternalLibraries": "MediaWiki\\Extension\\Mustache\\MustacheHooks::addLuaLibrary",
-		"ParserAfterTidy": "MediaWiki\\Extension\\Mustache\\MustacheHooks::onParserAfterTidy",
+		"ParserFirstCallInit": "main",
+		"ScribuntoExternalLibraries": "main",
+		"ParserAfterTidy": "main",
 		"CodeEditorGetPageLanguage": "MediaWiki\\Extension\\Mustache\\MustacheCodeEditorHooks::onCodeEditorGetPageLanguage"
 	},
 	"MessagesDirs": {
