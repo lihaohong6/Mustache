@@ -39,25 +39,9 @@ class MustacheUtils {
 
 		$titleText = $title->getFullText();
 
-		$revRecord = $parser->fetchCurrentRevisionRecordOfTitle( $title );
-		if ( !$revRecord ) {
-			return [
-				'success' => false,
-				'errorType' => 'template-not-found',
-				'name' => htmlspecialchars( $titleText )
-			];
-		}
+		[ $text, $title ] = $parser->fetchTemplateAndTitle( $title );
 
-		$content = $revRecord->getContent( SlotRecord::MAIN );
-		if ( !$content ) {
-			return [
-				'success' => false,
-				'errorType' => 'template-not-found',
-				'name' => htmlspecialchars( $titleText )
-			];
-		}
-
-		if ( MustacheUtils::$namespaceToContentModel[ $namespace ] !== $content->getModel() ) {
+		if ( MustacheUtils::$namespaceToContentModel[ $namespace ] !== $title->getContentModel() ) {
 			return [
 				'success' => false,
 				'errorType' => 'wrong-content-model',
@@ -67,7 +51,7 @@ class MustacheUtils {
 
 		return [
 			'success' => true,
-			'content' => $content->getText()
+			'content' => $text
 		];
 	}
 
