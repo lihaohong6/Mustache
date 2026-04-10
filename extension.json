@@ -54,6 +54,12 @@
 	"TestAutoloadNamespaces": {
 		"MediaWiki\\Extension\\Mustache\\Tests\\": "tests/phpunit/"
 	},
+	"config": {
+		"MustacheCacheDir": {
+			"value": "",
+			"description": "Directory path for compiled Mustache template cache. Leave empty to disable caching."
+		}
+	},
 	"ServiceWiringFiles": [
 		"includes/ServiceWiring.php"
 	],

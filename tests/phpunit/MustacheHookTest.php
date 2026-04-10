@@ -3,15 +3,20 @@
 namespace MediaWiki\Extension\Mustache\Tests;
 
 use MediaWiki\Extension\Mustache\MustacheHooks;
+use MediaWiki\Extension\Mustache\MustacheRenderer;
 use MediaWiki\Parser\Parser;
 use MediaWiki\Parser\PPFrame;
 use MediaWikiIntegrationTestCase;
 
 class MustacheHookTest extends MediaWikiIntegrationTestCase {
 
+	private MustacheHooks $hooks;
+
 	protected function setUp(): void {
 		parent::setUp();
 		$this->setMwGlobals( 'wgLanguageCode', 'qqx' );
+		$renderer = $this->createMock( MustacheRenderer::class );
+		$this->hooks = new MustacheHooks( $renderer );
 	}
 
 	/**
@@ -22,7 +27,7 @@ class MustacheHookTest extends MediaWikiIntegrationTestCase {
 		$frame = $this->createMock( PPFrame::class );
 		$args = [];
 
-		$result = MustacheHooks::renderMustache( $parser, $frame, $args );
+		$result = $this->hooks->renderMustache( $parser, $frame, $args );
 
 		$this->assertIsString( $result );
 		$this->assertStringContainsString( '(mustache-error-no-template)', $result );
@@ -41,7 +46,7 @@ class MustacheHookTest extends MediaWikiIntegrationTestCase {
 			->with( $args[0] )
 			->willReturn( '' );
 
-		$result = MustacheHooks::renderMustache( $parser, $frame, $args );
+		$result = $this->hooks->renderMustache( $parser, $frame, $args );
 
 		$this->assertIsString( $result );
 		$this->assertStringContainsString( '(mustache-error-no-template)', $result );
@@ -60,7 +65,7 @@ class MustacheHookTest extends MediaWikiIntegrationTestCase {
 			->with( $args[0] )
 			->willReturn( 'Invalid<Name' );
 
-		$result = MustacheHooks::renderMustache( $parser, $frame, $args );
+		$result = $this->hooks->renderMustache( $parser, $frame, $args );
 
 		$this->assertIsString( $result );
 		$this->assertStringContainsString( '(mustache-error-invalid-template: ', $result );
@@ -75,7 +80,7 @@ class MustacheHookTest extends MediaWikiIntegrationTestCase {
 		$frame = $this->createMock( PPFrame::class );
 		$args = [];
 
-		$result = MustacheHooks::renderHtml( $parser, $frame, $args );
+		$result = $this->hooks->renderHtml( $parser, $frame, $args );
 
 		$this->assertIsString( $result );
 		$this->assertStringContainsString( '(mustache-error-no-template)', $result );
@@ -94,7 +99,7 @@ class MustacheHookTest extends MediaWikiIntegrationTestCase {
 			->with( $args[0] )
 			->willReturn( '' );
 
-		$result = MustacheHooks::renderHtml( $parser, $frame, $args );
+		$result = $this->hooks->renderHtml( $parser, $frame, $args );
 
 		$this->assertIsString( $result );
 		$this->assertStringContainsString( '(mustache-error-no-template)', $result );
@@ -113,7 +118,7 @@ class MustacheHookTest extends MediaWikiIntegrationTestCase {
 			->with( $args[0] )
 			->willReturn( 'Invalid>Name' );
 
-		$result = MustacheHooks::renderHtml( $parser, $frame, $args );
+		$result = $this->hooks->renderHtml( $parser, $frame, $args );
 
 		$this->assertIsString( $result );
 		$this->assertStringContainsString( '(mustache-error-invalid-template: ', $result );
@@ -138,7 +143,7 @@ class MustacheHookTest extends MediaWikiIntegrationTestCase {
 			->willReturn( $parserOutput );
 
 		$textAfter = $text;
-		MustacheHooks::onParserAfterTidy( $parser, $textAfter );
+		$this->hooks->onParserAfterTidy( $parser, $textAfter );
 
 		$this->assertSame( $text, $textAfter );
 	}
@@ -161,7 +166,7 @@ class MustacheHookTest extends MediaWikiIntegrationTestCase {
 			->willReturn( $parserOutput );
 
 		$textAfter = $text;
-		MustacheHooks::onParserAfterTidy( $parser, $textAfter );
+		$this->hooks->onParserAfterTidy( $parser, $textAfter );
 
 		$this->assertSame( $text, $textAfter );
 	}
@@ -188,7 +193,7 @@ class MustacheHookTest extends MediaWikiIntegrationTestCase {
 			->method( 'getOutput' )
 			->willReturn( $parserOutput );
 
-		MustacheHooks::onParserAfterTidy( $parser, $text );
+		$this->hooks->onParserAfterTidy( $parser, $text );
 
 		$this->assertStringContainsString( $html1, $text );
 		$this->assertStringContainsString( $html2, $text );

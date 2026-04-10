@@ -15,10 +15,11 @@ class MustacheRenderer {
 	private const MARKER_SUFFIX = "_END</div>";
 	private const MARKER_PREFIX = "<div>\xEF\xBF\xBCMUSTACHE_";
 
-	public function render( string $template, array $data ): string {
-		$engine = new Engine( [
+	private Engine $engine;
+
+	public function __construct( string $cacheDir = '' ) {
+		$options = [
 			'entity_flags' => ENT_QUOTES,
-			// Lambdas required by PRAGMA_FILTERS
 			'lambdas' => true,
 			'dynamic_names' => false,
 			'inheritance' => false,
@@ -31,8 +32,15 @@ class MustacheRenderer {
 				}
 				return htmlspecialchars( $value, ENT_SUBSTITUTE, 'UTF-8', false );
 			},
-		] );
-		$rendered = $engine->render( $template, $data );
+		];
+		if ( $cacheDir !== '' ) {
+			$options['cache'] = $cacheDir;
+		}
+		$this->engine = new Engine( $options );
+	}
+
+	public function render( string $template, array $data ): string {
+		$rendered = $this->engine->render( $template, $data );
 		return $this->sanitizeRenderedTemplate( $rendered );
 	}
 
