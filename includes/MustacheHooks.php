@@ -85,7 +85,7 @@ class MustacheHooks {
 		return MustacheRenderer::storeForOutput( $parser, $html );
 	}
 
-	public static function addLuaLibrary( $engine, &$extraLibraries ) {
+	public static function addLuaLibrary( string $engine, array &$extraLibraries ): void {
 		if ( $engine === 'lua' ) {
 			$extraLibraries['mw.ext.mustache'] = MustacheLuaLibrary::class;
 		}

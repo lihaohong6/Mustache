@@ -2,10 +2,8 @@
 
 namespace MediaWiki\Extension\Mustache;
 
-use MediaWiki\MediaWikiServices;
 use MediaWiki\Parser\Parser;
 use MediaWiki\Parser\PPFrame;
-use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Title\Title;
 
 class MustacheUtils {
@@ -19,7 +17,7 @@ class MustacheUtils {
 
 		$name = trim( $name );
 
-		if ( empty( $name ) ) {
+		if ( $name === '' ) {
 			return [
 				'success' => false,
 				'errorType' => 'no-template',
@@ -41,7 +39,7 @@ class MustacheUtils {
 
 		[ $text, $title ] = $parser->fetchTemplateAndTitle( $title );
 
-		if ( MustacheUtils::$namespaceToContentModel[ $namespace ] !== $title->getContentModel() ) {
+		if ( self::$namespaceToContentModel[ $namespace ] !== $title->getContentModel() ) {
 			return [
 				'success' => false,
 				'errorType' => 'wrong-content-model',

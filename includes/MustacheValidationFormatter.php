@@ -76,7 +76,7 @@ class MustacheValidationFormatter extends RemexCompatFormatter {
 					}
 				} else {
 					if ( !self::isAttributeSafeForInterpolation( $attrNameLower ) ) {
-						$this->errors['dangerous-attributes'][] = [
+						$this->errors['dangerous-attribute'][] = [
 							$attrName,
 							$tagName
 						];
@@ -94,11 +94,6 @@ class MustacheValidationFormatter extends RemexCompatFormatter {
 		return parent::element( $parent, $node, $contents );
 	}
 
-	/**
-	 * Get all validation errors.
-	 *
-	 * @return array Array of errors grouped by type
-	 */
 	public function getErrors(): array {
 		return $this->errors;
 	}

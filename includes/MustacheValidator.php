@@ -46,6 +46,7 @@ class MustacheValidator {
 			'ignoreErrors' => true,
 			'ignoreCharRefs' => true,
 			'ignoreNulls' => true,
+			'skipPreprocess' => true,
 		] );
 
 		$tokenizer->execute( [
@@ -63,10 +64,11 @@ class MustacheValidator {
 
 		foreach ( $errors as $key => $value ) {
 			if (
-				$key === 'dangerous-attributes' ||
+				$key === 'dangerous-attribute' ||
 				$key === 'attribute-name-interpolation' ||
 				$key === 'unknown-filter' ||
-				$key === 'attribute-filter-required'
+				$key === 'attribute-filter-required' ||
+				$key === 'url-filter-required'
 			) {
 				foreach ( $value as $error ) {
 					$messages[] = wfMessage( 'mustache-error-' . $key, $error )

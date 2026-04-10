@@ -7,7 +7,8 @@ class MustacheDataParser {
 	public static function parseArguments( array $args ): array {
 		$data = [];
 
-		for ( $i = 1; $i < count( $args ); $i++ ) {
+		$argCount = count( $args );
+		for ( $i = 1; $i < $argCount; $i++ ) {
 			$arg = $args[$i];
 
 			if ( preg_match( '/^([^=]+)=(.*)$/s', $arg, $matches ) ) {
@@ -15,6 +16,7 @@ class MustacheDataParser {
 				$value = trim( $matches[2] );
 
 				$parsed = self::parseValue( $value );
+				// Return error if present for PHPUnit tests
 				$data[$key] = $parsed[1] ?? $parsed[0];
 			}
 		}

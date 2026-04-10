@@ -23,8 +23,8 @@ class MustacheSanitizingFormatter extends RemexCompatFormatter {
 			}
 		}
 
-		if ( count( $modifiedAttrs ) > 0 ) {
-			$node->attrs = new PlainAttributes( array_merge($node->attrs->getValues(), $modifiedAttrs ) );
+		if ( !empty( $modifiedAttrs ) ) {
+			$node->attrs = new PlainAttributes( array_merge( $node->attrs->getValues(), $modifiedAttrs ) );
 		}
 
 		return parent::element( $parent, $node, $contents );
