@@ -3,6 +3,7 @@
 namespace MediaWiki\Extension\Mustache;
 
 use MediaWiki\Parser\Parser;
+use Mustache\Cache;
 use Mustache\Engine;
 use Wikimedia\RemexHtml\HTMLData;
 use Wikimedia\RemexHtml\Serializer\Serializer;
@@ -17,7 +18,7 @@ class MustacheRenderer {
 
 	private Engine $engine;
 
-	public function __construct( string $cacheDir = '' ) {
+	public function __construct( ?Cache $cache = null ) {
 		$options = [
 			'entity_flags' => ENT_QUOTES,
 			'lambdas' => true,
@@ -33,8 +34,8 @@ class MustacheRenderer {
 				return htmlspecialchars( $value, ENT_SUBSTITUTE, 'UTF-8', false );
 			},
 		];
-		if ( $cacheDir !== '' ) {
-			$options['cache'] = $cacheDir;
+		if ( $cache !== null ) {
+			$options['cache'] = $cache;
 		}
 		$this->engine = new Engine( $options );
 	}

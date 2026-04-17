@@ -55,9 +55,13 @@
 		"MediaWiki\\Extension\\Mustache\\Tests\\": "tests/phpunit/"
 	},
 	"config": {
+		"MustacheCacheType": {
+			"value": "none",
+			"description": "Cache backend for compiled Mustache templates. Values: 'none' (disable caching), 'filesystem' (write PHP files to wgMustacheCacheDir), 'mediawiki' (use MediaWiki's configured object cache via BagOStuff)."
+		},
 		"MustacheCacheDir": {
 			"value": "",
-			"description": "Directory path for compiled Mustache template cache. Leave empty to disable caching."
+			"description": "Directory path for compiled Mustache template cache. Only used when MustacheCacheType is 'filesystem'."
 		}
 	},
 	"ServiceWiringFiles": [
