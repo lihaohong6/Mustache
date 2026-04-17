@@ -16,7 +16,10 @@ class MustacheFilters {
 				return new FilteredString( Sanitizer::checkCss( (string)$value ) );
 			},
 			'js-string' => static function ( $value ): FilteredString {
-				$json = json_encode( $value, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE );
+				$json = json_encode(
+					$value,
+					JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE
+				);
 				return new FilteredString( "'" . substr( $json, 1, -1 ) . "'" );
 			},
 			'js-identifier' => static function ( $value ): FilteredString {

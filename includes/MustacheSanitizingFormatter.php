@@ -9,6 +9,9 @@ use Wikimedia\RemexHtml\Tokenizer\PlainAttributes;
 
 class MustacheSanitizingFormatter extends RemexCompatFormatter {
 
+	/**
+	 * @inheritDoc
+	 */
 	public function element( SerializerNode $parent, SerializerNode $node, $contents ) {
 		$modifiedAttrs = [];
 

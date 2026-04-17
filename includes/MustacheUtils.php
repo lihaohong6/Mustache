@@ -14,7 +14,6 @@ class MustacheUtils {
 	];
 
 	public static function loadTemplateContent( string $name, int $namespace, Parser $parser ): array {
-
 		$name = trim( $name );
 
 		if ( $name === '' ) {

@@ -2,7 +2,6 @@
 
 namespace MediaWiki\Extension\Mustache\Tests;
 
-use MediaWiki\Extension\Mustache\MustacheValidationFormatter;
 use MediaWiki\Extension\Mustache\MustacheValidator;
 use MediaWikiIntegrationTestCase;
 
@@ -21,7 +20,7 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 
 		foreach ( $templates as $description => $template ) {
 			$errors = MustacheValidator::validateTemplate( $template );
-			$this->assertNotEmpty( $errors, "Raw interpolation should be blocked: $description");
+			$this->assertNotEmpty( $errors, "Raw interpolation should be blocked: $description" );
 			$errorString = implode( ' ', $errors );
 			$this->assertStringContainsStringIgnoringCase( 'raw', $errorString, "Error should mention raw interpolation: $description" );
 		}
@@ -40,7 +39,7 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 
 		foreach ( $templates as $description => $template ) {
 			$errors = MustacheValidator::validateTemplate( $template );
-			$this->assertNotEmpty( $errors, "Script interpolation should be blocked: $description");
+			$this->assertNotEmpty( $errors, "Script interpolation should be blocked: $description" );
 			$errorString = implode( ' ', $errors );
 			$this->assertStringContainsStringIgnoringCase( 'script', $errorString, "Error should mention script tag: $description" );
 		}
@@ -58,7 +57,7 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 
 		foreach ( $templates as $description => $template ) {
 			$errors = MustacheValidator::validateTemplate( $template );
-			$this->assertNotEmpty( $errors, "Style interpolation should be blocked: $description");
+			$this->assertNotEmpty( $errors, "Style interpolation should be blocked: $description" );
 			$errorString = implode( ' ', $errors );
 			$this->assertStringContainsStringIgnoringCase( 'style', $errorString, "Error should mention style tag: $description" );
 		}
@@ -76,7 +75,7 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 
 		foreach ( $templates as $description => $template ) {
 			$errors = MustacheValidator::validateTemplate( $template );
-			$this->assertEmpty( $errors, "Script tag with JS filter should be allowed: $description" );
+			$this->assertSame( [], $errors, "Script tag with JS filter should be allowed: $description" );
 		}
 	}
 
@@ -92,7 +91,7 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 
 		foreach ( $templates as $description => $template ) {
 			$errors = MustacheValidator::validateTemplate( $template );
-			$this->assertEmpty( $errors, "Style tag with CSS filter should be allowed: $description" );
+			$this->assertSame( [], $errors, "Style tag with CSS filter should be allowed: $description" );
 		}
 	}
 
@@ -147,7 +146,7 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 
 		foreach ( $templates as $description => $template ) {
 			$errors = MustacheValidator::validateTemplate( $template );
-			$this->assertNotEmpty( $errors, "Dangerous attribute should be blocked: $description");
+			$this->assertNotEmpty( $errors, "Dangerous attribute should be blocked: $description" );
 		}
 	}
 
@@ -167,7 +166,7 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 
 		foreach ( $templates as $description => $template ) {
 			$errors = MustacheValidator::validateTemplate( $template );
-			$this->assertEmpty( $errors, "Safe attribute should be allowed: $description");
+			$this->assertSame( [], $errors, "Safe attribute should be allowed: $description" );
 		}
 	}
 
@@ -215,7 +214,7 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 
 		foreach ( $templates as $description => $template ) {
 			$errors = MustacheValidator::validateTemplate( $template );
-			$this->assertEmpty( $errors, "Static content should be allowed: $description");
+			$this->assertSame( [], $errors, "Static content should be allowed: $description" );
 		}
 	}
 
@@ -231,7 +230,7 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 
 		foreach ( $templates as $description => $template ) {
 			$errors = MustacheValidator::validateTemplate( $template );
-			$this->assertEmpty( $errors, "Empty/whitespace templates should pass: $description");
+			$this->assertSame( [], $errors, "Empty/whitespace templates should pass: $description" );
 		}
 	}
 
@@ -247,7 +246,7 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 
 		foreach ( $templates as $description => $template ) {
 			$errors = MustacheValidator::validateTemplate( $template );
-			$this->assertEmpty( $errors, "Special characters should not cause false positives: $description");
+			$this->assertSame( [], $errors, "Special characters should not cause false positives: $description" );
 		}
 	}
 }

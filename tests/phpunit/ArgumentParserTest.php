@@ -164,9 +164,9 @@ class ArgumentParserTest extends MediaWikiIntegrationTestCase {
 		$result = MustacheDataParser::parseArguments( $args );
 
 		$this->assertIsArray( $result['emptyArray'] );
-		$this->assertEmpty( $result['emptyArray'] );
+		$this->assertSame( [], $result['emptyArray'] );
 		$this->assertIsArray( $result['emptyObject'] );
-		$this->assertEmpty( $result['emptyObject'] );
+		$this->assertSame( [], $result['emptyObject'] );
 	}
 
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare( strict_types = 1 );
+
 namespace MediaWiki\Extension\Mustache\Parsoid;
 
 use Wikimedia\Parsoid\Ext\ExtensionModule;

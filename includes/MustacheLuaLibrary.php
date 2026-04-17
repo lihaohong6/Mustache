@@ -8,6 +8,9 @@ use MediaWiki\MediaWikiServices;
 
 class MustacheLuaLibrary extends LibraryBase {
 
+	/**
+	 * @inheritDoc
+	 */
 	public function register() {
 		$lib = [
 			'render' => [ $this, 'mustacheRender' ],

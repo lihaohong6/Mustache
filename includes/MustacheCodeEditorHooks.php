@@ -2,11 +2,15 @@
 
 namespace MediaWiki\Extension\Mustache;
 
+use MediaWiki\Extension\CodeEditor\Hooks\CodeEditorGetPageLanguageHook;
 use MediaWiki\Title\Title;
 
-class MustacheCodeEditorHooks {
+class MustacheCodeEditorHooks implements CodeEditorGetPageLanguageHook {
 
-	public static function onCodeEditorGetPageLanguage( Title $title, ?string &$lang, string $model, string $format ) {
+	/**
+	 * @inheritDoc
+	 */
+	public function onCodeEditorGetPageLanguage( Title $title, ?string &$lang, string $model, string $format ) {
 		// TODO: should use Hooks::tempIsCodeMirrorBetaFeatureEnabled() to check for CodeMirror 6.
 		//  However, as of 2026-03-12 CM6 does not provide lib.mode.htmlmixed:
 		//  "CodeMirror 6 will eventually provide some or all of these modes"

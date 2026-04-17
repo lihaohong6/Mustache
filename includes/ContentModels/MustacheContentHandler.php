@@ -36,6 +36,9 @@ class MustacheContentHandler extends TextContentHandler {
 		return true;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function validateSave( Content $content, ValidationParams $validationParams ): StatusValue {
 		$template = $content->getText();
 		$errors = MustacheValidator::validateTemplate( $template );
@@ -50,10 +53,16 @@ class MustacheContentHandler extends TextContentHandler {
 		return $status;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function serializeContent( Content $content, $format = null ) {
 		return parent::serializeContent( $content, CONTENT_FORMAT_HTML );
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function importTransform( $blob, $format = null ) {
 		$errors = MustacheValidator::validateTemplate( $blob );
 		if ( !empty( $errors ) ) {

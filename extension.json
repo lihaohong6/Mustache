@@ -72,13 +72,16 @@
 		"main": {
 			"class": "MediaWiki\\Extension\\Mustache\\MustacheHooks",
 			"services": ["Mustache.Renderer"]
+		},
+		"codeeditor": {
+			"class": "MediaWiki\\Extension\\Mustache\\MustacheCodeEditorHooks"
 		}
 	},
 	"Hooks": {
 		"ParserFirstCallInit": "main",
 		"ScribuntoExternalLibraries": "main",
 		"ParserAfterTidy": "main",
-		"CodeEditorGetPageLanguage": "MediaWiki\\Extension\\Mustache\\MustacheCodeEditorHooks::onCodeEditorGetPageLanguage"
+		"CodeEditorGetPageLanguage": "codeeditor"
 	},
 	"MessagesDirs": {
 		"Mustache": "i18n"

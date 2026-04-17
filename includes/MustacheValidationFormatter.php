@@ -26,6 +26,9 @@ class MustacheValidationFormatter extends RemexCompatFormatter {
 		];
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function characters( SerializerNode $parent, $text, $start, $length ) {
 		$parentTag = strtolower( $parent->name ?? '' );
 
@@ -33,7 +36,7 @@ class MustacheValidationFormatter extends RemexCompatFormatter {
 			$actualText = substr( $text, $start, $length );
 			$requiredFilters = $this->restrictedTags[$parentTag];
 
-			foreach ( MustacheFilters::parseInterpolations( $actualText ) as [$varName, $filters] ) {
+			foreach ( MustacheFilters::parseInterpolations( $actualText ) as [ $varName, $filters ] ) {
 				// In restricted contexts, require at least one filter from the appropriate family.
 				if ( empty( array_intersect( $filters, $requiredFilters ) ) ) {
 					$this->errors["$parentTag-interpolation"][] = '';
@@ -44,6 +47,9 @@ class MustacheValidationFormatter extends RemexCompatFormatter {
 		return parent::characters( $parent, $text, $start, $length );
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function element( SerializerNode $parent, SerializerNode $node, $contents ) {
 		$tagName = strtolower( $node->name );
 
@@ -65,7 +71,7 @@ class MustacheValidationFormatter extends RemexCompatFormatter {
 					) && str_starts_with( $attrValue, '{{' )
 				) {
 					// Start of href and src are prone to XSS through protocols such as javascript:
-					foreach ( MustacheFilters::parseInterpolations( $attrValue ) as [$varName, $filters] ) {
+					foreach ( MustacheFilters::parseInterpolations( $attrValue ) as [ $varName, $filters ] ) {
 						if ( count( $filters ) !== 1 || $filters[0] !== 'url' ) {
 							$this->errors['url-filter-required'][] = [
 								$attrNameLower,
@@ -104,7 +110,7 @@ class MustacheValidationFormatter extends RemexCompatFormatter {
 		string $attrValue,
 		string $requiredFilter
 	): void {
-		foreach ( MustacheFilters::parseInterpolations( $attrValue ) as [$varName, $filters] ) {
+		foreach ( MustacheFilters::parseInterpolations( $attrValue ) as [ $varName, $filters ] ) {
 			if ( !in_array( $requiredFilter, $filters ) ) {
 				$this->errors['attribute-filter-required'][] = [
 					$attrName,

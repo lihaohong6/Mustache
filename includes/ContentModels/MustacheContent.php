@@ -6,10 +6,16 @@ use MediaWiki\Content\TextContent;
 
 class MustacheContent extends TextContent {
 
+	/**
+	 * @inheritDoc
+	 */
 	public function __construct( $text ) {
 		parent::__construct( $text, CONTENT_MODEL_MUSTACHE );
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function isValid(): bool {
 		// We could try to validate here, but trying to import an invalid mustache template will fail with a
 		// cryptic error.

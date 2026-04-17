@@ -27,7 +27,7 @@ class MustacheRenderer {
 			'strict_callables' => true,
 			'pragmas' => [ Engine::PRAGMA_FILTERS ],
 			'helpers' => MustacheFilters::getBuiltinFilters(),
-			'escape' => function ( $value ) {
+			'escape' => static function ( $value ) {
 				if ( $value instanceof FilteredString ) {
 					return (string)$value;
 				}
