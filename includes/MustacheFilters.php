@@ -12,6 +12,8 @@ class MustacheFilters {
 				return new FilteredString( preg_replace( '/[^a-zA-Z0-9_.#-]/', '', (string)$value ) );
 			},
 			'css-value' => static function ( $value ): FilteredString {
+				// This filter does not escape =. So when a user writes <div style={{test|css-value}}> it will
+				// lead to XSS. Let's hope IAs always quote their attributes.
 				$value = preg_replace( '|[\'":;{}\\\\/<>]|', '', (string)$value );
 				return new FilteredString( Sanitizer::checkCss( (string)$value ) );
 			},
