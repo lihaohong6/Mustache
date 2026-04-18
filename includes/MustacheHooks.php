@@ -4,6 +4,7 @@ namespace MediaWiki\Extension\Mustache;
 
 use MediaWiki\Parser\Parser;
 use MediaWiki\Parser\PPFrame;
+use Mustache\Exception as MustacheException;
 
 class MustacheHooks {
 
@@ -66,7 +67,15 @@ class MustacheHooks {
 			}
 		}
 
-		$html = $this->renderer->render( $template, $data );
+		try {
+			$html = $this->renderer->render( $template, $data );
+		} catch ( MustacheException $e ) {
+			return MustacheUtils::formatTemplateError(
+				'render-failed',
+				$e->getMessage(),
+				'mustache-error-'
+			);
+		}
 
 		return $this->renderer->storeForOutput( $parser, $html );
 	}

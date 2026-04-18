@@ -5,6 +5,7 @@ namespace MediaWiki\Extension\Mustache;
 use MediaWiki\Extension\Scribunto\Engines\LuaCommon\LibraryBase;
 use MediaWiki\Extension\Scribunto\Engines\LuaCommon\LuaError;
 use MediaWiki\MediaWikiServices;
+use Mustache\Exception as MustacheException;
 
 class MustacheLuaLibrary extends LibraryBase {
 
@@ -18,6 +19,9 @@ class MustacheLuaLibrary extends LibraryBase {
 		return $this->getEngine()->registerInterface( __DIR__ . '/mw.ext.mustache.lua', $lib, [] );
 	}
 
+	/**
+	 * @throws LuaError
+	 */
 	public function mustacheRender( string $templateName, array $data ): array {
 		$this->checkType( 'render', 1, $templateName, 'string' );
 		$this->checkTypeOptional( 'render', 2, $data, 'table', [] );
@@ -38,7 +42,12 @@ class MustacheLuaLibrary extends LibraryBase {
 		$phpData = self::convertLuaTableToArray( $data );
 
 		$renderer = MustacheServices::wrap( MediaWikiServices::getInstance() )->getRenderer();
-		$html = $renderer->render( $template, $phpData );
+		try {
+			$html = $renderer->render( $template, $phpData );
+		} catch ( MustacheException $e ) {
+			throw new LuaError( wfMessage( 'mustache-error-render-failed', $e->getMessage() )
+				->inContentLanguage()->text() );
+		}
 
 		$marker = $renderer->storeForOutput( $this->getParser(), $html );
 

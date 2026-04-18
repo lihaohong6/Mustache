@@ -10,5 +10,6 @@
 	"mustache-error-script-interpolation": "Error message shown when a Mustache template contains Mustache syntax inside &lt;script&gt; tags.",
 	"mustache-error-style-interpolation": "Error message shown when a Mustache template contains Mustache syntax inside &lt;style&gt; tags.",
 	"mustache-error-dangerous-attribute": "Error message shown when a Mustache template contains interpolation in dangerous attributes.\n\nParameters: $1 - the attribute name; $2 - the tag name",
-	"mustache-error-attribute-name-interpolation": "Error message shown when a Mustache template contains interpolation in attribute names.\n\nParameters: $1 - the tag name"
+	"mustache-error-attribute-name-interpolation": "Error message shown when a Mustache template contains interpolation in attribute names.\n\nParameters: $1 - the tag name",
+	"mustache-error-render-failed": "Error message shown when Mustache template rendering fails due to an engine error.\n\nParameters:\n* $1 - the error message from the Mustache engine"
 }
