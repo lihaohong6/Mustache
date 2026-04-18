@@ -26,6 +26,13 @@ class MustacheValidationFormatter extends RemexCompatFormatter {
 		];
 	}
 
+	private function addError( string $key, array $params = [] ): void {
+		$this->errors[] = [
+			'key' => $key,
+			'params' => $params
+		];
+	}
+
 	/**
 	 * @inheritDoc
 	 */
@@ -39,7 +46,7 @@ class MustacheValidationFormatter extends RemexCompatFormatter {
 			foreach ( MustacheFilters::parseInterpolations( $actualText ) as [ $varName, $filters ] ) {
 				// In restricted contexts, require at least one filter from the appropriate family.
 				if ( empty( array_intersect( $filters, $requiredFilters ) ) ) {
-					$this->errors["$parentTag-interpolation"][] = '';
+					$this->addError( "$parentTag-interpolation" );
 				}
 			}
 		}
@@ -57,7 +64,7 @@ class MustacheValidationFormatter extends RemexCompatFormatter {
 			$attrNameLower = strtolower( $attrName );
 
 			if ( str_contains( $attrName, '{{' ) ) {
-				$this->errors['attribute-name-interpolation'][] = [ $tagName ];
+				$this->addError( 'attribute-name-interpolation', [ $tagName ] );
 			}
 
 			if ( str_contains( $attrValue, '{{' ) ) {
@@ -73,19 +80,25 @@ class MustacheValidationFormatter extends RemexCompatFormatter {
 					// Start of href and src are prone to XSS through protocols such as javascript:
 					foreach ( MustacheFilters::parseInterpolations( $attrValue ) as [ $varName, $filters ] ) {
 						if ( count( $filters ) !== 1 || $filters[0] !== 'url' ) {
-							$this->errors['url-filter-required'][] = [
-								$attrNameLower,
-								$tagName
-							];
+							$this->addError(
+								'url-filter-required',
+								[
+									$attrNameLower,
+									$tagName
+								]
+							);
 							break;
 						}
 					}
 				} else {
 					if ( !self::isAttributeSafeForInterpolation( $attrNameLower ) ) {
-						$this->errors['dangerous-attribute'][] = [
-							$attrName,
-							$tagName
-						];
+						$this->addError(
+							'dangerous-attribute',
+							[
+								$attrName,
+								$tagName
+							]
+						);
 					} else {
 						if ( $attrNameLower === 'style' ) {
 							$this->checkAttributeFilter( $tagName, $attrNameLower, $attrValue, 'css-value' );
@@ -112,11 +125,14 @@ class MustacheValidationFormatter extends RemexCompatFormatter {
 	): void {
 		foreach ( MustacheFilters::parseInterpolations( $attrValue ) as [ $varName, $filters ] ) {
 			if ( !in_array( $requiredFilter, $filters ) ) {
-				$this->errors['attribute-filter-required'][] = [
-					$attrName,
-					$tagName,
-					$requiredFilter
-				];
+				$this->addError(
+					'attribute-filter-required',
+					[
+						$attrName,
+						$tagName,
+						$requiredFilter
+					]
+				);
 				break;
 			}
 		}

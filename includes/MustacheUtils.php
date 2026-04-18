@@ -38,6 +38,14 @@ class MustacheUtils {
 
 		[ $text, $title ] = $parser->fetchTemplateAndTitle( $title );
 
+		if ( $text === false ) {
+			return [
+				'success' => false,
+				'errorType' => 'template-not-found',
+				'name' => htmlspecialchars( $titleText ),
+			];
+		}
+
 		if ( self::$namespaceToContentModel[ $namespace ] !== $title->getContentModel() ) {
 			return [
 				'success' => false,

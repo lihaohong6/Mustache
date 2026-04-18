@@ -15,7 +15,10 @@ class MustacheValidator {
 
 		// Check {{{, {{&, and {{=
 		if ( preg_match( '/\{\{[{&=]/', $template ) > 0 ) {
-			$errors['raw-interpolation'][] = '';
+			$errors[] = [
+				'key' => 'raw-interpolation',
+				'params' => []
+			];
 		}
 
 		$allowedFilters = MustacheFilters::getBuiltinFilters();
@@ -25,14 +28,20 @@ class MustacheValidator {
 				continue;
 			}
 			if ( count( $filters ) > 1 ) {
-				$errors['unknown-filter'][] = implode( '|', $filters );
+				$errors[] = [
+					'key' => 'unknown-filter',
+					'params' => [ implode( '|', $filters ) ]
+				];
 				continue;
 			}
 			$filter = $filters[0];
 			if ( isset( $allowedFilters[ $filter ] ) ) {
 				continue;
 			}
-			$errors['unknown-filter'][] = $filter;
+			$errors[] = [
+				'key' => 'unknown-filter',
+				'params' => [ $filter ]
+			];
 		}
 
 		$formatter = new MustacheValidationFormatter();
@@ -62,22 +71,9 @@ class MustacheValidator {
 	private static function formatErrors( array $errors ): array {
 		$messages = [];
 
-		foreach ( $errors as $key => $value ) {
-			if (
-				$key === 'dangerous-attribute' ||
-				$key === 'attribute-name-interpolation' ||
-				$key === 'unknown-filter' ||
-				$key === 'attribute-filter-required' ||
-				$key === 'url-filter-required'
-			) {
-				foreach ( $value as $error ) {
-					$messages[] = wfMessage( 'mustache-error-' . $key, $error )
-						->inContentLanguage()->text();
-				}
-			} else {
-				$messages[] = wfMessage( 'mustache-error-' . $key )
-					->inContentLanguage()->text();
-			}
+		foreach ( $errors as $error ) {
+			$messages[] = wfMessage( 'mustache-error-' . $error['key'], ...$error['params'] )
+				->inContentLanguage()->text();
 		}
 
 		return $messages;

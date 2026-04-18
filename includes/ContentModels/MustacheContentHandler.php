@@ -7,6 +7,7 @@ use MediaWiki\Content\TextContentHandler;
 use MediaWiki\Content\ValidationParams;
 use MediaWiki\Exception\MWContentSerializationException;
 use MediaWiki\Extension\Mustache\MustacheValidator;
+use MediaWiki\Language\RawMessage;
 use StatusValue;
 
 class MustacheContentHandler extends TextContentHandler {
@@ -46,7 +47,7 @@ class MustacheContentHandler extends TextContentHandler {
 		$status = StatusValue::newGood();
 		if ( $errors ) {
 			foreach ( $errors as $error ) {
-				$status->fatal( new \RawMessage( '$1', [ $error ] ) );
+				$status->fatal( new RawMessage( '$1', [ $error ] ) );
 			}
 		}
 
