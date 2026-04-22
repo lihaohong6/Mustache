@@ -19,10 +19,10 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $templates as $description => $template ) {
-			$errors = MustacheValidator::validateTemplate( $template );
+			$errors = MustacheValidator::getValidationErrors( $template );
 			$this->assertNotEmpty( $errors, "Raw interpolation should be blocked: $description" );
-			$errorString = implode( ' ', $errors );
-			$this->assertStringContainsStringIgnoringCase( 'raw', $errorString, "Error should mention raw interpolation: $description" );
+			$errorString = implode( ' ', array_column( $errors, 'key' ) );
+			$this->assertStringContainsString( 'raw', $errorString, "Error should mention raw interpolation: $description" );
 		}
 	}
 
@@ -38,10 +38,10 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $templates as $description => $template ) {
-			$errors = MustacheValidator::validateTemplate( $template );
+			$errors = MustacheValidator::getValidationErrors( $template );
 			$this->assertNotEmpty( $errors, "Script interpolation should be blocked: $description" );
-			$errorString = implode( ' ', $errors );
-			$this->assertStringContainsStringIgnoringCase( 'script', $errorString, "Error should mention script tag: $description" );
+			$errorString = implode( ' ', array_column( $errors, 'key' ) );
+			$this->assertStringContainsString( 'script', $errorString, "Error should mention script tag: $description" );
 		}
 	}
 
@@ -56,10 +56,10 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $templates as $description => $template ) {
-			$errors = MustacheValidator::validateTemplate( $template );
+			$errors = MustacheValidator::getValidationErrors( $template );
 			$this->assertNotEmpty( $errors, "Style interpolation should be blocked: $description" );
-			$errorString = implode( ' ', $errors );
-			$this->assertStringContainsStringIgnoringCase( 'style', $errorString, "Error should mention style tag: $description" );
+			$errorString = implode( ' ', array_column( $errors, 'key' ) );
+			$this->assertStringContainsString( 'style', $errorString, "Error should mention style tag: $description" );
 		}
 	}
 
@@ -74,7 +74,7 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $templates as $description => $template ) {
-			$errors = MustacheValidator::validateTemplate( $template );
+			$errors = MustacheValidator::getValidationErrors( $template );
 			$this->assertSame( [], $errors, "Script tag with JS filter should be allowed: $description" );
 		}
 	}
@@ -90,7 +90,7 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $templates as $description => $template ) {
-			$errors = MustacheValidator::validateTemplate( $template );
+			$errors = MustacheValidator::getValidationErrors( $template );
 			$this->assertSame( [], $errors, "Style tag with CSS filter should be allowed: $description" );
 		}
 	}
@@ -107,10 +107,10 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $templates as $description => $template ) {
-			$errors = MustacheValidator::validateTemplate( $template );
+			$errors = MustacheValidator::getValidationErrors( $template );
 			$this->assertNotEmpty( $errors, "Unknown filter should be blocked: $description" );
-			$errorString = implode( ' ', $errors );
-			$this->assertStringContainsStringIgnoringCase( 'filter', $errorString, "Error should mention filter: $description" );
+			$errorString = implode( ' ', array_column( $errors, 'key' ) );
+			$this->assertStringContainsString( 'filter', $errorString, "Error should mention filter: $description" );
 		}
 	}
 
@@ -126,7 +126,7 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $templates as $description => $template ) {
-			$errors = MustacheValidator::validateTemplate( $template );
+			$errors = MustacheValidator::getValidationErrors( $template );
 			$this->assertNotEmpty( $errors, "Wrong-context filter should be blocked: $description" );
 		}
 	}
@@ -145,7 +145,7 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $templates as $description => $template ) {
-			$errors = MustacheValidator::validateTemplate( $template );
+			$errors = MustacheValidator::getValidationErrors( $template );
 			$this->assertNotEmpty( $errors, "Dangerous attribute should be blocked: $description" );
 		}
 	}
@@ -165,7 +165,7 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $templates as $description => $template ) {
-			$errors = MustacheValidator::validateTemplate( $template );
+			$errors = MustacheValidator::getValidationErrors( $template );
 			$this->assertSame( [], $errors, "Safe attribute should be allowed: $description" );
 		}
 	}
@@ -180,9 +180,9 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $templates as $description => $template ) {
-			$errors = MustacheValidator::validateTemplate( $template );
+			$errors = MustacheValidator::getValidationErrors( $template );
 			$this->assertNotEmpty( $errors, "Missing attribute filter should be blocked: $description" );
-			$this->assertStringContainsString( 'attribute', implode( ' ', $errors ) );
+			$this->assertStringContainsString( 'attribute', implode( ' ', array_column( $errors, 'key' ) ) );
 		}
 	}
 
@@ -196,9 +196,10 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $templates as $description => $template ) {
-			$errors = MustacheValidator::validateTemplate( $template );
+			$errors = MustacheValidator::getValidationErrors( $template );
 			$this->assertNotEmpty( $errors, "Missing css-value filter in style attribute should be blocked: $description" );
-			$this->assertStringContainsString( 'css-value', implode( ' ', $errors ) );
+			$allParams = array_merge( [], ...array_column( $errors, 'params' ) );
+			$this->assertContains( 'css-value', $allParams, "Error should specify css-value filter: $description" );
 		}
 	}
 
@@ -213,7 +214,7 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $templates as $description => $template ) {
-			$errors = MustacheValidator::validateTemplate( $template );
+			$errors = MustacheValidator::getValidationErrors( $template );
 			$this->assertSame( [], $errors, "Static content should be allowed: $description" );
 		}
 	}
@@ -229,9 +230,29 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $templates as $description => $template ) {
-			$errors = MustacheValidator::validateTemplate( $template );
+			$errors = MustacheValidator::getValidationErrors( $template );
 			$this->assertSame( [], $errors, "Empty/whitespace templates should pass: $description" );
 		}
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\Mustache\MustacheValidator::getValidationErrors
+	 */
+	public function testGetValidationErrorsReturnsRawStructure() {
+		$errors = MustacheValidator::getValidationErrors( '<div>{{{raw}}}</div>' );
+		$this->assertNotEmpty( $errors );
+		$this->assertArrayHasKey( 'key', $errors[0] );
+		$this->assertArrayHasKey( 'params', $errors[0] );
+		$this->assertSame( 'raw-interpolation', $errors[0]['key'] );
+		$this->assertSame( [], $errors[0]['params'] );
+	}
+
+	/**
+	 * @covers MediaWiki\Extension\Mustache\MustacheValidator::getValidationErrors
+	 */
+	public function testGetValidationErrorsReturnsEmptyForValidTemplate() {
+		$errors = MustacheValidator::getValidationErrors( '<div class="{{ cls|attribute }}">text</div>' );
+		$this->assertSame( [], $errors );
 	}
 
 	/**
@@ -245,7 +266,7 @@ class MustacheValidationFormatterTest extends MediaWikiIntegrationTestCase {
 		];
 
 		foreach ( $templates as $description => $template ) {
-			$errors = MustacheValidator::validateTemplate( $template );
+			$errors = MustacheValidator::getValidationErrors( $template );
 			$this->assertSame( [], $errors, "Special characters should not cause false positives: $description" );
 		}
 	}

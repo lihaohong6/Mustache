@@ -11,6 +11,10 @@ use Wikimedia\RemexHtml\TreeBuilder\TreeBuilder;
 class MustacheValidator {
 
 	public static function validateTemplate( string $template ): array {
+		return self::formatErrors( self::getValidationErrors( $template ) );
+	}
+
+	public static function getValidationErrors( string $template ): array {
 		$errors = [];
 
 		// Check {{{, {{&, and {{=
@@ -65,7 +69,7 @@ class MustacheValidator {
 
 		$errors = array_merge( $errors, $formatter->getErrors() );
 
-		return self::formatErrors( $errors );
+		return $errors;
 	}
 
 	private static function formatErrors( array $errors ): array {

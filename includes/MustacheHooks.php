@@ -49,6 +49,14 @@ class MustacheHooks {
 
 		$template = $result['content'];
 
+		$popts = $parser->getOptions();
+		if ( $popts->getIsPreview() ) {
+			$errors = MustacheValidator::getValidationErrors( $template );
+			foreach ( $errors as $error ) {
+				$parser->getOutput()->addWarningMsg( 'mustache-error-' . $error['key'], ...$error['params'] );
+			}
+		}
+
 		$data = [];
 		$argCount = count( $args );
 		for ( $i = 1; $i < $argCount; $i++ ) {
