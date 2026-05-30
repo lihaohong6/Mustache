@@ -77,6 +77,8 @@ class MustacheHooks {
 
 		try {
 			$html = $this->renderer->render( $template, $data );
+		} catch ( MustacheDisabledException ) {
+			return MustacheUtils::formatTemplateError( 'templates-disabled', '', 'mustache-error-' );
 		} catch ( MustacheException $e ) {
 			return MustacheUtils::formatTemplateError(
 				'render-failed',

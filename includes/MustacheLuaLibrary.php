@@ -44,6 +44,8 @@ class MustacheLuaLibrary extends LibraryBase {
 		$renderer = MustacheServices::wrap( MediaWikiServices::getInstance() )->getRenderer();
 		try {
 			$html = $renderer->render( $template, $phpData );
+		} catch ( MustacheDisabledException ) {
+			throw new LuaError( wfMessage( 'mustache-error-templates-disabled' )->inContentLanguage()->text() );
 		} catch ( MustacheException $e ) {
 			throw new LuaError( wfMessage( 'mustache-error-render-failed', $e->getMessage() )
 				->inContentLanguage()->text() );

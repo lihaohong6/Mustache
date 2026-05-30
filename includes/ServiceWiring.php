@@ -20,6 +20,6 @@ return [
 			default => null,
 		};
 
-		return new MustacheRenderer( $cache );
+		return new MustacheRenderer( $cache, $config->get( 'MustacheDisableTemplates' ) );
 	},
 ];

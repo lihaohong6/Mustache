@@ -62,6 +62,10 @@
 		"MustacheCacheDir": {
 			"value": "",
 			"description": "Directory path for compiled Mustache template cache. Only used when MustacheCacheType is 'filesystem'."
+		},
+		"MustacheDisableTemplates": {
+			"value": false,
+			"description": "When true, Mustache template rendering is disabled. Only raw HTML via {{#html:}} remains functional."
 		}
 	},
 	"ServiceWiringFiles": [

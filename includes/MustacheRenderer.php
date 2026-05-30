@@ -18,7 +18,7 @@ class MustacheRenderer {
 
 	private Engine $engine;
 
-	public function __construct( ?Cache $cache = null ) {
+	public function __construct( ?Cache $cache = null, private bool $disableTemplates = false ) {
 		$options = [
 			'entity_flags' => ENT_QUOTES,
 			'lambdas' => true,
@@ -41,6 +41,9 @@ class MustacheRenderer {
 	}
 
 	public function render( string $template, array $data ): string {
+		if ( $this->disableTemplates ) {
+			throw new MustacheDisabledException();
+		}
 		$rendered = $this->engine->render( $template, $data );
 		return $this->sanitizeRenderedTemplate( $rendered );
 	}
