@@ -64,7 +64,7 @@ class MustacheUtils {
 		$msgKey = $messagePrefix . $errorType;
 		$params = $name ? [ $name ] : [];
 		return '<span class="error">' .
-			wfMessage( $msgKey, ...$params )->inContentLanguage()->text() .
+			wfMessage( $msgKey, ...$params )->inContentLanguage()->escaped() .
 			'</span>';
 	}
 
