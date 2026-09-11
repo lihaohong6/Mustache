@@ -53,7 +53,7 @@ class MustacheFilters {
 
 	public static function parseInterpolations( string $text ): array {
 		$result = [];
-		preg_match_all( '/\{\{([^}]+)}}/', $text, $matches );
+		preg_match_all( '/\{\{([^{}]+)}}/', $text, $matches );
 		foreach ( $matches[1] as $expr ) {
 			$filters = array_map( 'trim', explode( '|', $expr ) );
 			$varName = array_shift( $filters );
