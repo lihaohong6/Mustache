@@ -42,7 +42,6 @@
 	"attributes": {
 		"TemplateSandbox": {
 			"EditNamespaces": [
-				9200,
 				9210
 			]
 		}
@@ -53,20 +52,6 @@
 	},
 	"TestAutoloadNamespaces": {
 		"MediaWiki\\Extension\\Mustache\\Tests\\": "tests/phpunit/"
-	},
-	"config": {
-		"MustacheCacheType": {
-			"value": "none",
-			"description": "Cache backend for compiled Mustache templates. Values: 'none' (disable caching), 'filesystem' (write PHP files to wgMustacheCacheDir), 'mediawiki' (use MediaWiki's configured object cache via BagOStuff)."
-		},
-		"MustacheCacheDir": {
-			"value": "",
-			"description": "Directory path for compiled Mustache template cache. Only used when MustacheCacheType is 'filesystem'."
-		},
-		"MustacheDisableTemplates": {
-			"value": false,
-			"description": "When true, Mustache template rendering is disabled. Only raw HTML via {{#html:}} remains functional."
-		}
 	},
 	"ServiceWiringFiles": [
 		"includes/ServiceWiring.php"
@@ -83,7 +68,6 @@
 	},
 	"Hooks": {
 		"ParserFirstCallInit": "main",
-		"ScribuntoExternalLibraries": "main",
 		"ParserAfterTidy": "main",
 		"CodeEditorGetPageLanguage": "codeeditor"
 	},

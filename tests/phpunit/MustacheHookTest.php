@@ -20,59 +20,6 @@ class MustacheHookTest extends MediaWikiIntegrationTestCase {
 	}
 
 	/**
-	 * @covers MediaWiki\Extension\Mustache\MustacheHooks::renderMustache
-	 */
-	public function testRenderMustacheWithNoTemplate() {
-		$parser = $this->createMock( Parser::class );
-		$frame = $this->createMock( PPFrame::class );
-		$args = [];
-
-		$result = $this->hooks->renderMustache( $parser, $frame, $args );
-
-		$this->assertIsString( $result );
-		$this->assertStringContainsString( '(mustache-error-no-template)', $result );
-	}
-
-	/**
-	 * @covers MediaWiki\Extension\Mustache\MustacheHooks::renderMustache
-	 */
-	public function testRenderMustacheWithEmptyTemplateName() {
-		$parser = $this->createMock( Parser::class );
-		$frame = $this->createMock( PPFrame::class );
-		$args = [ '' ];
-
-		$frame->expects( $this->once() )
-			->method( 'expand' )
-			->with( $args[0] )
-			->willReturn( '' );
-
-		$result = $this->hooks->renderMustache( $parser, $frame, $args );
-
-		$this->assertIsString( $result );
-		$this->assertStringContainsString( '(mustache-error-no-template)', $result );
-	}
-
-	/**
-	 * @covers MediaWiki\Extension\Mustache\MustacheHooks::renderMustache
-	 */
-	public function testRenderMustacheWithInvalidTemplateName() {
-		$parser = $this->createMock( Parser::class );
-		$frame = $this->createMock( PPFrame::class );
-		$args = [ 'Invalid<Name' ];
-
-		$frame->expects( $this->once() )
-			->method( 'expand' )
-			->with( $args[0] )
-			->willReturn( 'Invalid<Name' );
-
-		$result = $this->hooks->renderMustache( $parser, $frame, $args );
-
-		$this->assertIsString( $result );
-		$this->assertStringContainsString( '(mustache-error-invalid-template: ', $result );
-		$this->assertStringContainsString( 'Invalid&lt;Name', $result );
-	}
-
-	/**
 	 * @covers MediaWiki\Extension\Mustache\MustacheHooks::renderHtml
 	 */
 	public function testRenderHtmlWithNoTemplate() {

@@ -3,15 +3,13 @@
 namespace MediaWiki\Extension\Mustache\ContentModels;
 
 use MediaWiki\Content\Content;
-use MediaWiki\Content\Renderer\ContentParseParams;
 use MediaWiki\Content\TextContentHandler;
-use MediaWiki\Content\ValidationParams;
-use MediaWiki\Exception\MWContentSerializationException;
-use MediaWiki\Extension\Mustache\MustacheValidator;
-use MediaWiki\Language\RawMessage;
-use MediaWiki\Parser\ParserOutput;
-use StatusValue;
+use MediaWiki\Title\Title;
 
+/**
+ * Placeholder that occupies the namespace and name in case Mustache templates are reintroduced in the future.
+ * All pages are set to read-only and can only be deleted.
+ */
 class MustacheContentHandler extends TextContentHandler {
 
 	public function __construct() {
@@ -42,55 +40,21 @@ class MustacheContentHandler extends TextContentHandler {
 	/**
 	 * @inheritDoc
 	 */
-	public function validateSave( Content $content, ValidationParams $validationParams ): StatusValue {
-		$template = $content->getText();
-		$errors = MustacheValidator::validateTemplate( $template );
-
-		$status = StatusValue::newGood();
-		if ( $errors ) {
-			foreach ( $errors as $error ) {
-				$status->fatal( new RawMessage( '$1', [ $error ] ) );
-			}
-		}
-
-		return $status;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
 	public function serializeContent( Content $content, $format = null ) {
 		return parent::serializeContent( $content, CONTENT_FORMAT_HTML );
 	}
 
-	protected function fillParserOutput(
-		Content $content,
-		ContentParseParams $cpoParams,
-		ParserOutput &$output
-	): void {
-		parent::fillParserOutput( $content, $cpoParams, $output );
-
-		// Show errors in the preview so that users don't have to save before knowing what the error is
-		$popts = $cpoParams->getParserOptions();
-		if ( $popts->getIsPreview() ) {
-			$errors = MustacheValidator::getValidationErrors( $content->getText() );
-			foreach ( $errors as $error ) {
-				$output->addWarningMsg( 'mustache-error-' . $error['key'], ...$error['params'] );
-			}
-		}
+	/**
+	 * @inheritDoc
+	 */
+	public function supportsDirectEditing() {
+		return false;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function importTransform( $blob, $format = null ) {
-		$errors = MustacheValidator::validateTemplate( $blob );
-		if ( !empty( $errors ) ) {
-			throw new MWContentSerializationException(
-				wfMessage( 'mustache-import-error-invalid-content' )
-					->inContentLanguage()->text()
-			);
-		}
-		return $blob;
+	public function canBeUsedOn( Title $title ) {
+		return false;
 	}
 }

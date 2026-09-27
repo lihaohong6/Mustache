@@ -4,7 +4,6 @@ namespace MediaWiki\Extension\Mustache;
 
 use MediaWiki\Parser\Parser;
 use MediaWiki\Parser\PPFrame;
-use Mustache\Exception as MustacheException;
 
 class MustacheHooks {
 
@@ -18,14 +17,6 @@ class MustacheHooks {
 
 	public function onParserFirstCallInit( Parser $parser ): void {
 		$parser->setFunctionHook(
-			'mustache',
-			[
-				$this,
-				'renderMustache'
-			],
-			Parser::SFH_OBJECT_ARGS
-		);
-		$parser->setFunctionHook(
 			'html',
 			[
 				$this,
@@ -33,61 +24,6 @@ class MustacheHooks {
 			],
 			Parser::SFH_OBJECT_ARGS
 		);
-	}
-
-	public function renderMustache( Parser $parser, PPFrame $frame, array $args ): string|array {
-		$templateName = MustacheUtils::extractTemplateName( $args, $frame );
-		$result = MustacheUtils::loadTemplateContent( $templateName, NS_MUSTACHE, $parser );
-
-		if ( !$result['success'] ) {
-			return MustacheUtils::formatTemplateError(
-				$result['errorType'],
-				$result['name'],
-				'mustache-error-'
-			);
-		}
-
-		$template = $result['content'];
-
-		$popts = $parser->getOptions();
-		if ( $popts->getIsPreview() ) {
-			$errors = MustacheValidator::getValidationErrors( $template );
-			foreach ( $errors as $error ) {
-				$parser->getOutput()->addWarningMsg( 'mustache-error-' . $error['key'], ...$error['params'] );
-			}
-		}
-
-		$data = [];
-		$argCount = count( $args );
-		for ( $i = 1; $i < $argCount; $i++ ) {
-			$expandedArg = $frame->expand( $args[$i] );
-
-			if ( preg_match( '/^([^=]+)=(.*)$/s', $expandedArg, $matches ) ) {
-				$key = trim( $matches[1] );
-				$value = trim( $matches[2] );
-				$value = $parser->recursivePreprocess( $value );
-				$parsed = MustacheDataParser::parseValue( $value );
-				if ( count( $parsed ) === 1 ) {
-					$data[ $key ] = $parsed[0];
-				} else {
-					return $parsed[1];
-				}
-			}
-		}
-
-		try {
-			$html = $this->renderer->render( $template, $data );
-		} catch ( MustacheDisabledException ) {
-			return MustacheUtils::formatTemplateError( 'templates-disabled', '', 'mustache-error-' );
-		} catch ( MustacheException $e ) {
-			return MustacheUtils::formatTemplateError(
-				'render-failed',
-				$e->getMessage(),
-				'mustache-error-'
-			);
-		}
-
-		return $this->renderer->storeForOutput( $parser, $html );
 	}
 
 	public function renderHtml( Parser $parser, PPFrame $frame, array $args ): string|array {
@@ -105,12 +41,6 @@ class MustacheHooks {
 		$html = $result['content'];
 
 		return $this->renderer->storeForOutput( $parser, $html );
-	}
-
-	public function onScribuntoExternalLibraries( string $engine, array &$extraLibraries ): void {
-		if ( $engine === 'lua' ) {
-			$extraLibraries['mw.ext.mustache'] = MustacheLuaLibrary::class;
-		}
 	}
 
 	public function onParserAfterTidy( Parser $parser, string &$text ): void {

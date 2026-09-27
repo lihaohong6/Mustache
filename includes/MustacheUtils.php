@@ -9,7 +9,6 @@ use MediaWiki\Title\Title;
 class MustacheUtils {
 
 	private static array $namespaceToContentModel = [
-		NS_MUSTACHE => CONTENT_MODEL_MUSTACHE,
 		NS_HTML => CONTENT_MODEL_HTML,
 	];
 

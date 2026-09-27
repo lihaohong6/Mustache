@@ -15,7 +15,7 @@ class MustacheCodeEditorHooks implements CodeEditorGetPageLanguageHook {
 		//  However, as of 2026-03-12 CM6 does not provide lib.mode.htmlmixed:
 		//  "CodeMirror 6 will eventually provide some or all of these modes"
 		//  See https://www.mediawiki.org/wiki/Extension:CodeMirror
-		if ( $model === 'mustache' || $model === 'html' ) {
+		if ( $model === 'html' ) {
 			$lang = 'html';
 			return false;
 		}
