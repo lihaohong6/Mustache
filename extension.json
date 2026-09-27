@@ -69,6 +69,7 @@
 	"Hooks": {
 		"ParserFirstCallInit": "main",
 		"ParserAfterTidy": "main",
+		"ParserClearState": "main",
 		"CodeEditorGetPageLanguage": "codeeditor"
 	},
 	"MessagesDirs": {

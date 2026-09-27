@@ -7,6 +7,9 @@ use MediaWiki\Parser\PPFrame;
 
 class MustacheHooks {
 
+	/** @var array<string, true> */
+	private array $transcludedHtmlPages = [];
+
 	public function __construct( private readonly MustacheRenderer $renderer ) {
 	}
 
@@ -38,9 +41,19 @@ class MustacheHooks {
 			);
 		}
 
+		$key = $result['title']->getPrefixedDBkey();
+		if ( isset( $this->transcludedHtmlPages[$key] ) && MustacheUtils::transcludeOnce( $args, $frame ) ) {
+			return '';
+		}
+		$this->transcludedHtmlPages[$key] = true;
+
 		$html = $result['content'];
 
 		return $this->renderer->storeForOutput( $parser, $html );
+	}
+
+	public function onParserClearState( Parser $parser ): void {
+		$this->transcludedHtmlPages = [];
 	}
 
 	public function onParserAfterTidy( Parser $parser, string &$text ): void {

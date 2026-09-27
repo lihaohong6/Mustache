@@ -39,3 +39,28 @@ HTML with inline scripts
 </div>
 <div>B</div>
 !! end
+
+!! article
+Html:Snippet
+!! text
+<span>snippet</span>
+!! endarticle
+
+!! test
+once=true transcludes a page only once
+!! wikitext
+{{#html:Snippet|once=true}}
+{{#html:Snippet|once=true}}
+!! html
+<span>snippet</span>
+!! end
+
+!! test
+once=false transcludes every time
+!! wikitext
+{{#html:Snippet|once=false}}
+{{#html:Snippet|once=false}}
+!! html
+<span>snippet</span>
+<span>snippet</span>
+!! end

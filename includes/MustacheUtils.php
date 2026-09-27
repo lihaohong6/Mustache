@@ -55,7 +55,8 @@ class MustacheUtils {
 
 		return [
 			'success' => true,
-			'content' => $text
+			'content' => $text,
+			'title' => $title,
 		];
 	}
 
@@ -72,5 +73,15 @@ class MustacheUtils {
 			return '';
 		}
 		return trim( $frame->expand( $args[0] ) );
+	}
+
+	public static function transcludeOnce( array $args, PPFrame $frame ): bool {
+		foreach ( array_slice( $args, 1 ) as $arg ) {
+			$parts = explode( '=', $frame->expand( $arg ), 2 );
+			if ( count( $parts ) === 2 && trim( $parts[0] ) === 'once' ) {
+				return wfStringToBool( trim( $parts[1] ) );
+			}
+		}
+		return false;
 	}
 }
