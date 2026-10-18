@@ -40,6 +40,11 @@
 		}
 	],
 	"attributes": {
+		"CodeMirror": {
+			"ParserFunctionNsIds": {
+				"html": 9210
+			}
+		},
 		"TemplateSandbox": {
 			"EditNamespaces": [
 				9210
