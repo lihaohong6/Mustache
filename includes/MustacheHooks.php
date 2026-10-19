@@ -34,6 +34,15 @@ class MustacheHooks {
 	}
 
 	public function renderHtml( Parser $parser, PPFrame $frame, array $args ): string|array {
+		// Marker is only expanded properly in OT_HTML.
+		// Do not use marker in other modes of expansion, such as subst and Special:ExpandTemplate.
+		$outputType = $parser->getOutputType();
+		// Parsoid expands parser functions with OT_PREPROCESS
+		$isUsingParsoid = $outputType === OT_PREPROCESS && $parser->getOptions()->getUseParsoid();
+		if ( $outputType !== Parser::OT_HTML && !$isUsingParsoid ) {
+			return '{{#html:' . implode( '|', array_map( $frame->expand( ... ), $args ) ) . '}}';
+		}
+
 		$pageName = MustacheUtils::extractTemplateName( $args, $frame );
 		$result = MustacheUtils::loadTemplateContent( $pageName, NS_HTML, $parser );
 

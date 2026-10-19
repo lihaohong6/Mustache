@@ -130,3 +130,15 @@ Unclosed comments do not hide subsequent content
 <div>A</div><!---->
 <div>B</div>
 !! end
+
+!! test
+Substitution keeps the parser function call
+!! options
+pst
+!! wikitext
+{{subst:#html:Snippet|once=true}}
+{{safesubst:#html:Snippet}}
+!! html
+{{#html:Snippet|once=true}}
+{{#html:Snippet}}
+!! end
