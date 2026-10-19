@@ -4,13 +4,17 @@ namespace MediaWiki\Extension\Mustache;
 
 use MediaWiki\Parser\Parser;
 use MediaWiki\Parser\PPFrame;
+use MediaWiki\Tidy\TidyDriverBase;
 
 class MustacheHooks {
 
 	/** @var array<string, true> */
 	private array $transcludedHtmlPages = [];
 
-	public function __construct( private readonly MustacheRenderer $renderer ) {
+	public function __construct(
+		private readonly MustacheRenderer $renderer,
+		private readonly TidyDriverBase $tidy
+	) {
 	}
 
 	public static function onRegistration(): void {
@@ -47,7 +51,7 @@ class MustacheHooks {
 		}
 		$this->transcludedHtmlPages[$key] = true;
 
-		$html = $result['content'];
+		$html = $this->tidy->tidy( $result['content'] );
 
 		return $this->renderer->storeForOutput( $parser, $html );
 	}

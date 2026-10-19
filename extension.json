@@ -65,7 +65,10 @@
 	"HookHandlers": {
 		"main": {
 			"class": "MediaWiki\\Extension\\Mustache\\MustacheHooks",
-			"services": ["Mustache.Renderer"]
+			"services": [
+				"Mustache.Renderer",
+				"Tidy"
+			]
 		},
 		"codeeditor": {
 			"class": "MediaWiki\\Extension\\Mustache\\MustacheCodeEditorHooks"
