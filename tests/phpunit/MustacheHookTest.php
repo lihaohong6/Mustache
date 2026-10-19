@@ -16,7 +16,7 @@ class MustacheHookTest extends MediaWikiIntegrationTestCase {
 		parent::setUp();
 		$this->setMwGlobals( 'wgLanguageCode', 'qqx' );
 		$renderer = $this->createMock( MustacheRenderer::class );
-		$this->hooks = new MustacheHooks( $renderer, $this->getServiceContainer()->getTidy() );
+		$this->hooks = new MustacheHooks( $renderer, $this->getServiceContainer()->get( 'Mustache.Tidy' ) );
 	}
 
 	/**

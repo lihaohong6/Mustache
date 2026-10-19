@@ -67,7 +67,7 @@
 			"class": "MediaWiki\\Extension\\Mustache\\MustacheHooks",
 			"services": [
 				"Mustache.Renderer",
-				"Tidy"
+				"Mustache.Tidy"
 			]
 		},
 		"codeeditor": {

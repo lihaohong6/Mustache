@@ -64,3 +64,69 @@ once=false transcludes every time
 <span>snippet</span>
 <span>snippet</span>
 !! end
+
+!! article
+Html:Open
+!! text
+<script>/*
+!! endarticle
+
+!! article
+Html:Close
+!! text
+*/</script>
+!! endarticle
+
+!! test
+Unbalanced script tags
+!! wikitext
+{{#html:Open}}*/alert('xss');/*{{#html:Close}}
+!! html
+<script>/*</script><p>*/alert('xss');/*</p>*/
+!! end
+
+!! article
+Html:Document
+!! text
+<!DOCTYPE html><html lang="en"><head><title>T</title></head><body><p>Body</p></body></html>
+!! endarticle
+
+!! test
+Document-level tags are stripped
+!! wikitext
+{{#html:Document}}
+!! html
+<title>T</title><p>Body</p>
+!! end
+
+!! article
+Html:UnclosedHtml
+!! text
+<html><body><div>A
+!! endarticle
+
+!! test
+Unclosed html and body tags are balanced
+!! wikitext
+{{#html:UnclosedHtml}}
+<div>B</div>
+!! html
+<div>A</div>
+<div>B</div>
+!! end
+
+!! article
+Html:OpenComment
+!! text
+<div>A</div><!--
+!! endarticle
+
+!! test
+Unclosed comments do not hide subsequent content
+!! wikitext
+{{#html:OpenComment}}
+<div>B</div>
+!! html
+<div>A</div><!---->
+<div>B</div>
+!! end
