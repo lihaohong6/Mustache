@@ -5,6 +5,7 @@ namespace MediaWiki\Extension\Mustache\ContentModels;
 use MediaWiki\Content\Content;
 use MediaWiki\Content\TextContentHandler;
 use MediaWiki\Content\ValidationParams;
+use MediaWiki\Title\Title;
 use StatusValue;
 
 class HtmlContentHandler extends TextContentHandler {
@@ -46,5 +47,12 @@ class HtmlContentHandler extends TextContentHandler {
 	 */
 	public function serializeContent( Content $content, $format = null ) {
 		return parent::serializeContent( $content, CONTENT_FORMAT_HTML );
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function canBeUsedOn( Title $title ) {
+		return $title->getNamespace() === NS_HTML && parent::canBeUsedOn( $title );
 	}
 }
