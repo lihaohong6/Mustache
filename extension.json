@@ -72,13 +72,17 @@
 		},
 		"codeeditor": {
 			"class": "MediaWiki\\Extension\\Mustache\\MustacheCodeEditorHooks"
+		},
+		"permissions": {
+			"class": "MediaWiki\\Extension\\Mustache\\MustachePermissionHooks"
 		}
 	},
 	"Hooks": {
 		"ParserFirstCallInit": "main",
 		"ParserAfterTidy": "main",
 		"ParserClearState": "main",
-		"CodeEditorGetPageLanguage": "codeeditor"
+		"CodeEditorGetPageLanguage": "codeeditor",
+		"getUserPermissionsErrors": "permissions"
 	},
 	"MessagesDirs": {
 		"Mustache": "i18n"
