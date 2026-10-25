@@ -2,7 +2,7 @@
 	"@metadata": {
 		"authors": []
 	},
-	"mustache-desc": "Allows trusted users to create raw HTML snippets that can be used on content pages with the {{#html:}} parser function.",
+	"mustache-desc": "Allows trusted users to create raw HTML snippets that can be used on content pages with the <code><nowiki>{{#html:}}</nowiki></code> parser function.",
 	"mustache-error-no-template": "No HTML page specified",
 	"mustache-error-invalid-template": "Invalid HTML page name: [[$1]]",
 	"mustache-error-template-not-found": "HTML page not found or empty: [[$1]]",
