@@ -3,6 +3,7 @@
 namespace MediaWiki\Extension\Mustache;
 
 use MediaWiki\Permissions\Hook\GetUserPermissionsErrorsHook;
+use MediaWiki\Permissions\PermissionManager;
 
 class MustachePermissionHooks implements GetUserPermissionsErrorsHook {
 
@@ -15,6 +16,11 @@ class MustachePermissionHooks implements GetUserPermissionsErrorsHook {
 		'undelete',
 	];
 
+	public function __construct(
+		private readonly PermissionManager $permissionManager
+	) {
+	}
+
 	/**
 	 * @inheritDoc
 	 */
@@ -24,7 +30,10 @@ class MustachePermissionHooks implements GetUserPermissionsErrorsHook {
 			return true;
 		}
 
-		if ( $user->isAllowedAll( 'editsitecss', 'editsitejs' ) ) {
+		// Formerly isAllowedAll. MW 1.47 requires recent reauthentication for these rights which cannot be handled
+		// properly by this extension for now.
+		$rights = $this->permissionManager->getUserPermissions( $user );
+		if ( in_array( 'editsitecss', $rights ) && in_array( 'editsitejs', $rights ) ) {
 			return true;
 		}
 

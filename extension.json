@@ -74,7 +74,10 @@
 			"class": "MediaWiki\\Extension\\Mustache\\MustacheCodeEditorHooks"
 		},
 		"permissions": {
-			"class": "MediaWiki\\Extension\\Mustache\\MustachePermissionHooks"
+			"class": "MediaWiki\\Extension\\Mustache\\MustachePermissionHooks",
+			"services": [
+				"PermissionManager"
+			]
 		}
 	},
 	"Hooks": {
